@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: object model for vegecom
+Bundle-SymbolicName: com.veisite.vegecom.model
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Veisite Software
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: com.veisite.vegecom.model,
+ com.veisite.vegecom.model.audit,
+ com.veisite.vegecom.model.security

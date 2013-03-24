@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: common utilities
+Bundle-SymbolicName: com.veisite.utils
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Veisite Software
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: com.veisite.utils,
+ com.veisite.utils.bean,
+ com.veisite.utils.binding,
+ com.veisite.utils.dataio,
+ com.veisite.utils.date,
+ com.veisite.utils.math,
+ com.veisite.utils.tasks
