@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: vegecom services
+Bundle-SymbolicName: com.veisite.vegecom.service
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Veisite Software
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: com.veisite.vegecom.service,
+ com.veisite.vegecom.service.audit,
+ com.veisite.vegecom.service.security
