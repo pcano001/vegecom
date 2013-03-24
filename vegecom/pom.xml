@@ -47,5 +47,6 @@
     <module>vegecom-model</module>
     <module>vegecom-service</module>
     <module>vegecom-service-dao</module>
+    <module>vegecom-server</module>
   </modules>
 </project>
