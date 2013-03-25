@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: vegecom json serializarion service
+Bundle-SymbolicName: com.veisite.vegecom.service.json
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Veisite Software
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

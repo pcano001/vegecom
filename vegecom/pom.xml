@@ -48,5 +48,6 @@
     <module>vegecom-service</module>
     <module>vegecom-service-dao</module>
     <module>vegecom-server</module>
+    <module>vegecom-json</module>
   </modules>
 </project>

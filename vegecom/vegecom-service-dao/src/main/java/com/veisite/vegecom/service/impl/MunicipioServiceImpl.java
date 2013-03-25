@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.veisite.utils.dataio.DataIOException;
+import com.veisite.utils.dataio.ObjectOutputFlow;
 import com.veisite.vegecom.model.Municipio;
 import com.veisite.vegecom.model.Provincia;
 import com.veisite.vegecom.service.MunicipioService;
@@ -22,26 +24,30 @@ public class MunicipioServiceImpl implements MunicipioService {
 		return dao.save(municipio);
 	}
 
-	@Override @Transactional
+	@Transactional
 	public Municipio getById(String id) {
 		return dao.getById(id);
 	}
 
-	@Override @Transactional
+	@Transactional
 	public List<Municipio> getList() {
 		return dao.getList();
 	}
+	
+	@Transactional
+	public void getList(ObjectOutputFlow<Municipio> output) throws DataIOException {
+		dao.getList(output);
+	}
 
-	@Override @Transactional
+	@Transactional
 	public List<Municipio> getListbyProvincia(Provincia provincia) {
 		return dao.getListbyProvincia(provincia);
 		
 	}
 
-	@Override @Transactional
+	@Transactional
 	public Municipio getByNombre(String nombre) {
 		return dao.getByNombre(nombre);
-		
 	}
 
 }
