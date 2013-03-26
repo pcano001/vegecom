@@ -15,6 +15,10 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.veisite.utils.EqualsUtil;
 import com.veisite.utils.HashCodeUtil;
 
@@ -31,6 +35,8 @@ import com.veisite.utils.HashCodeUtil;
  * @author josemaria
  *
  */
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+@JsonInclude(Include.NON_NULL)
 @Entity
 public class Referencia extends VersionableObject {
 

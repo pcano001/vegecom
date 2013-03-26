@@ -64,12 +64,15 @@ public class MunicipioDAO {
 		return null;
 	}
 
-	public void getList(ObjectOutputFlow<Municipio> output) throws DataIOException {
+	public void getList(ObjectOutputFlow<Municipio> output, Provincia provincia) throws DataIOException {
 		org.hibernate.Session session = (Session) em.getDelegate();
-		org.hibernate.Query q = session.createQuery("FROM Municipio m "
-				+ "LEFT JOIN FETCH m.provincia "
-				+ "ORDER BY m.nombre");
-
+		String sq = "FROM Municipio m LEFT JOIN FETCH m.provincia ";
+		if (provincia!=null) {
+			sq += "WHERE m.provincia = :provincia ";
+		}
+		sq += "ORDER BY m.nombre";
+		org.hibernate.Query q = session.createQuery(sq);
+		if (provincia!=null) q.setParameter("provincia", provincia);
 		logger.debug("Quering database for Municipio List...");
 		ScrollableResults sc = q.scroll(ScrollMode.FORWARD_ONLY);
 		logger.debug("Begin writing municipio to ObjectOutputStream...");

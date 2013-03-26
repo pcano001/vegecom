@@ -35,8 +35,8 @@ public class MunicipioServiceImpl implements MunicipioService {
 	}
 	
 	@Transactional
-	public void getList(ObjectOutputFlow<Municipio> output) throws DataIOException {
-		dao.getList(output);
+	public void getList(ObjectOutputFlow<Municipio> output, Provincia provincia) throws DataIOException {
+		dao.getList(output, provincia);
 	}
 
 	@Transactional

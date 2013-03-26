@@ -15,7 +15,7 @@ public interface MunicipioService {
 
 	public List<Municipio> getList();
 
-	public void getList(ObjectOutputFlow<Municipio> output) throws DataIOException;
+	public void getList(ObjectOutputFlow<Municipio> output, Provincia provincia) throws DataIOException;
 
 	public List<Municipio> getListbyProvincia(Provincia provincia);
 	
