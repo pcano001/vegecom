@@ -7,7 +7,7 @@ import com.veisite.utils.dataio.DataIOException;
 import com.veisite.utils.dataio.OutputFlowProviderRunnable;
 import com.veisite.utils.dataio.PipedObjectInputFlow;
 import com.veisite.utils.dataio.PipedObjectOutputFlow;
-import com.veisite.vegecom.rest.SerializationService;
+import com.veisite.vegecom.service.SerializationService;
 
 public class ObjectFlowWriter<T> {
 	

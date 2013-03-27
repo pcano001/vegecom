@@ -17,7 +17,7 @@ import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
 import com.veisite.utils.dataio.DataIOException;
 import com.veisite.utils.dataio.ObjectInputFlow;
 import com.veisite.utils.dataio.ObjectOutputFlow;
-import com.veisite.vegecom.rest.SerializationService;
+import com.veisite.vegecom.service.SerializationService;
 
 @Service
 public class JsonSerializationService implements SerializationService {

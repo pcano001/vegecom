@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.veisite.utils.dataio.OutputFlowProviderRunnable;
 import com.veisite.vegecom.model.Cliente;
-import com.veisite.vegecom.rest.SerializationService;
 import com.veisite.vegecom.service.ClienteService;
+import com.veisite.vegecom.service.SerializationService;
 
 @Controller
 @RequestMapping("/cliente")

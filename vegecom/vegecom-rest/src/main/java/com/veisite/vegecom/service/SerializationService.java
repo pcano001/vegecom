@@ -1,4 +1,4 @@
-package com.veisite.vegecom.rest;
+package com.veisite.vegecom.service;
 
 import java.io.IOException;
 import java.io.InputStream;

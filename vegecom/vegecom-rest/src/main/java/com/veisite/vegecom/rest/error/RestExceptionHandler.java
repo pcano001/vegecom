@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver;
 
-import com.veisite.vegecom.rest.SerializationService;
+import com.veisite.vegecom.service.SerializationService;
 
 public class RestExceptionHandler extends AbstractHandlerExceptionResolver {
 
