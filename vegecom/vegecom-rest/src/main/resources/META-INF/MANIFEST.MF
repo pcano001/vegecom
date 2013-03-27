@@ -5,3 +5,5 @@ Bundle-SymbolicName: com.veisite.vegecom.rest
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Veisite Software
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: com.veisite.vegecom.rest, 
+ com.veisite.vegecom.rest.error 

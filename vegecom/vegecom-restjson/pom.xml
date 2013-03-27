@@ -8,7 +8,7 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   <groupId>com.veisite.vegecom</groupId>
-  <artifactId>vegecom-json</artifactId>
+  <artifactId>vegecom-restjson</artifactId>
   <name>vegecom-json json serialization service</name>
   <url>http://maven.apache.org</url>
   
