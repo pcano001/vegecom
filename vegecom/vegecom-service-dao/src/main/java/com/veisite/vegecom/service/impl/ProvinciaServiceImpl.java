@@ -24,8 +24,6 @@ public class ProvinciaServiceImpl extends AbstractCacheableDataService<Provincia
 	
 	public ProvinciaServiceImpl() {
 		super();
-		// Tiempo de cache de 1 hora.
-		setEvictionTime(3600000L);
 	}
 
 	@Transactional @Override
