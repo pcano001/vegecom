@@ -10,7 +10,7 @@
   <groupId>com.veisite.vegecom</groupId>
   <artifactId>vegecom-restserver</artifactId>
   <packaging>war</packaging>
-  <name>vegecom-server rest server</name>
+  <name>vegecom rest server</name>
   <url>http://maven.apache.org</url>
 
   <dependencies>

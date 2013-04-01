@@ -43,7 +43,8 @@ public class ClienteDAO {
 
 	public void remove(Cliente cliente) {
 		if (cliente.getId()==null) return;
-		em.remove(em.merge(cliente));
+		cliente = (Cliente) em.find(Cliente.class, cliente.getId());
+		if (cliente!=null) em.remove(cliente);
 	}
 	
 	/**

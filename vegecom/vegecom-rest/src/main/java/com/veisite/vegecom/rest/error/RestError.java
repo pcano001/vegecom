@@ -1,26 +1,8 @@
-/*
-* Copyright 2012 Stormpath, Inc.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
 package com.veisite.vegecom.rest.error;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.util.ObjectUtils;
 
-/**
-* @author Les Hazlewood
-*/
 public class RestError {
 
     private final HttpStatus status;
@@ -28,9 +10,8 @@ public class RestError {
     private final String message;
     private final String developerMessage;
     private final String moreInfoUrl;
-    private final Throwable throwable;
 
-    public RestError(HttpStatus status, int code, String message, String developerMessage, String moreInfoUrl, Throwable throwable) {
+    public RestError(HttpStatus status, int code, String message, String developerMessage, String moreInfoUrl) {
         if (status == null) {
             throw new NullPointerException("HttpStatus argument cannot be null.");
         }
@@ -39,7 +20,6 @@ public class RestError {
         this.message = message;
         this.developerMessage = developerMessage;
         this.moreInfoUrl = moreInfoUrl;
-        this.throwable = throwable;
     }
 
     public HttpStatus getStatus() {
@@ -62,10 +42,6 @@ public class RestError {
         return moreInfoUrl;
     }
 
-    public Throwable getThrowable() {
-        return throwable;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -77,8 +53,7 @@ public class RestError {
                     getCode() == re.getCode() &&
                     ObjectUtils.nullSafeEquals(getMessage(), re.getMessage()) &&
                     ObjectUtils.nullSafeEquals(getDeveloperMessage(), re.getDeveloperMessage()) &&
-                    ObjectUtils.nullSafeEquals(getMoreInfoUrl(), re.getMoreInfoUrl()) &&
-                    ObjectUtils.nullSafeEquals(getThrowable(), re.getThrowable());
+                    ObjectUtils.nullSafeEquals(getMoreInfoUrl(), re.getMoreInfoUrl());
         }
         return false;
     }
@@ -87,7 +62,7 @@ public class RestError {
     public int hashCode() {
         //noinspection ThrowableResultOfMethodCallIgnored
         return ObjectUtils.nullSafeHashCode(new Object[]{
-                getStatus(), getCode(), getMessage(), getDeveloperMessage(), getMoreInfoUrl(), getThrowable()
+                getStatus(), getCode(), getMessage(), getDeveloperMessage(), getMoreInfoUrl()
         });
     }
 
@@ -98,58 +73,4 @@ public class RestError {
                 .toString();
     }
 
-    public static class Builder {
-
-        private HttpStatus status;
-        private int code;
-        private String message;
-        private String developerMessage;
-        private String moreInfoUrl;
-        private Throwable throwable;
-
-        public Builder() {
-        }
-
-        public Builder setStatus(int statusCode) {
-            this.status = HttpStatus.valueOf(statusCode);
-            return this;
-        }
-
-        public Builder setStatus(HttpStatus status) {
-            this.status = status;
-            return this;
-        }
-
-        public Builder setCode(int code) {
-            this.code = code;
-            return this;
-        }
-
-        public Builder setMessage(String message) {
-            this.message = message;
-            return this;
-        }
-
-        public Builder setDeveloperMessage(String developerMessage) {
-            this.developerMessage = developerMessage;
-            return this;
-        }
-
-        public Builder setMoreInfoUrl(String moreInfoUrl) {
-            this.moreInfoUrl = moreInfoUrl;
-            return this;
-        }
-
-        public Builder setThrowable(Throwable throwable) {
-            this.throwable = throwable;
-            return this;
-        }
-
-        public RestError build() {
-            if (this.status == null) {
-                this.status = HttpStatus.INTERNAL_SERVER_ERROR;
-            }
-            return new RestError(this.status, this.code, this.message, this.developerMessage, this.moreInfoUrl, this.throwable);
-        }
-    }
 }

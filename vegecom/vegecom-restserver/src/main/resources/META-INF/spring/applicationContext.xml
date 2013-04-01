@@ -11,7 +11,7 @@
     <context:property-placeholder 
     	location="classpath:META-INF/application.properties,classpath:META-INF/spring/database.properties"/>
 
-	<bean id="serverMessageSource"
+	<bean id="messageSource"
 		class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename">
 			<value>i18n.server.messages</value>

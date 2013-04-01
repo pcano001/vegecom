@@ -15,6 +15,11 @@
 */
 package com.veisite.vegecom.rest.error;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.TypeMismatchException;
@@ -32,8 +37,6 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
-
-import java.util.*;
 
 /**
 * Default {@code RestErrorResolver} implementation that converts discovered Exceptions to
@@ -152,11 +155,10 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
             return null;
         }
 
-        RestError.Builder builder = new RestError.Builder();
+        RestErrorBuilder builder = new RestErrorBuilder();
         builder.setStatus(getStatusValue(template, request, ex));
         builder.setCode(getCode(template, request, ex));
         builder.setMoreInfoUrl(getMoreInfoUrl(template, request, ex));
-        builder.setThrowable(ex);
 
         String msg = getMessage(template, request, ex);
         if (msg != null) {
@@ -214,6 +216,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 */
     protected String getMessage(String msg, ServletWebRequest webRequest, Exception ex) {
 
+        log.debug("getMessage para clave {} en bundle {}",msg,messageSource.toString());
         if (msg != null) {
             if (msg.equalsIgnoreCase("null") || msg.equalsIgnoreCase("off")) {
                 return null;
@@ -226,6 +229,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
                 if (localeResolver != null) {
                     locale = localeResolver.resolveLocale(webRequest.getRequest());
                 }
+                log.debug("Intentando obtener mensaje para clave {}",msg);
                 msg = messageSource.getMessage(msg, null, msg, locale);
             }
         }
@@ -310,7 +314,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
             throw new IllegalStateException("Invalid config mapping. Exception names must map to a string configuration.");
         }
 
-        RestError.Builder builder = new RestError.Builder();
+        RestErrorBuilder builder = new RestErrorBuilder();
 
         boolean statusSet = false;
         boolean codeSet = false;
