@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: swing ui application for vegecom
+Bundle-SymbolicName: com.veisite.vegecom.swingui
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Veisite Software
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

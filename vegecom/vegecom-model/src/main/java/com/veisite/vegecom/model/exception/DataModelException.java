@@ -7,7 +7,7 @@ package com.veisite.vegecom.model.exception;
  * @author josemaria
  *
  */
-public class DataModelException extends Exception {
+public class DataModelException extends VegecomException {
 
 	/**
 	 * serial
