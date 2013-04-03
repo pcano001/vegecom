@@ -81,6 +81,7 @@ public class MunicipioDAO {
 		if (provincia!=null) pId=provincia.getId();
 		logger.debug("Quering server for Municipio List...");
 		tp.execute(url, HttpMethod.GET, cb, ex, pId);
+		output.close();
 		logger.debug("Reading municipio has ended correctly, exiting...");
 	}
 

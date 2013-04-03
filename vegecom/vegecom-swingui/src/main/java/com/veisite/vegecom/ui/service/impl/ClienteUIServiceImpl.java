@@ -177,7 +177,7 @@ public class ClienteUIServiceImpl extends UIFrameworkAbstractService
 		boolean error=false;
 		Throwable excep=null;
 		try {
-			dataService.remove(cliente);
+			dataService.remove(cliente.getId());
 		} catch (DataAccessException e) {
 			excep = e;
 			error = true;

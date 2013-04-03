@@ -39,9 +39,10 @@ public class ProveedorDAO {
 		return proveedor;
 	}
 
-	public void remove(Proveedor proveedor) {
-		if (proveedor.getId()==null) return;
-		em.remove(proveedor);
+	public Proveedor remove(Long id) {
+		Proveedor proveedor = getById(id);
+		if (proveedor!=null) em.remove(proveedor);
+		return proveedor;
 	}
 	
 	/**

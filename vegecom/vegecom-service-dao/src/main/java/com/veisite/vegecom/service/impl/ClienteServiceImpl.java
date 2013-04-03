@@ -3,6 +3,7 @@ package com.veisite.vegecom.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,9 +29,12 @@ public class ClienteServiceImpl extends TerceroServiceImpl<Cliente> implements C
 	}
 
 	@Override @Transactional
-	public void remove(Cliente cliente) {
-		dao.remove(cliente);
-		fireItemRemovedEvent(cliente);
+	public Cliente remove(Long id) {
+		Cliente c = dao.remove(id);
+		if (c==null)
+			throw new DataRetrievalFailureException("Cliente "+id+" not found");
+		fireItemRemovedEvent(c);
+		return c;
 	}
 
 	@Override @Transactional

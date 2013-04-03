@@ -29,9 +29,18 @@ public class JsonSerializationService implements SerializationService {
 	public JsonSerializationService() {
 		this.factory = new JsonFactory();
 		this.mapper = new ObjectMapper(factory);
-		mapper.registerModule(new Hibernate4Module());
+		configureHibernateModule(); 
 		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 		mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+	}
+	
+	private void configureHibernateModule() {
+		try {
+			Class.forName("org.hibernate.collection.spi.PersistentCollection", 
+					false, getClass().getClassLoader());
+			mapper.registerModule(new Hibernate4Module());
+		} catch (ClassNotFoundException e) {
+		}
 	}
 
 	public <T> void writeList(OutputStream output, List<T> lista) throws IOException {

@@ -3,6 +3,7 @@ package com.veisite.vegecom.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,9 +29,12 @@ public class ProveedorServiceImpl extends TerceroServiceImpl<Proveedor> implemen
 	}
 
 	@Override @Transactional
-	public void remove(Proveedor proveedor) {
-		dao.remove(proveedor);
-		fireItemRemovedEvent(proveedor);
+	public Proveedor remove(Long id) {
+		Proveedor p = dao.remove(id);
+		if (p==null)
+			throw new DataRetrievalFailureException("Proveedor "+id+" not found");
+		fireItemRemovedEvent(p);
+		return p;
 	}
 
 	@Override @Transactional

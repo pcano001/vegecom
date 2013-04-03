@@ -78,8 +78,8 @@ public class ClienteController {
 	}
 	
 	@RequestMapping(value="", method=RequestMethod.POST)
-	public @ResponseBody void create(HttpServletRequest request, HttpServletResponse response) 
-				throws IOException, DataModelException {
+	public @ResponseBody void create(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, DataModelException {
 		logger.debug("Requesting cliente creation");
 		Cliente o = null;
 		try {
@@ -106,8 +106,8 @@ public class ClienteController {
 	}
 	
 	@RequestMapping(value="/{id}", method=RequestMethod.PUT)
-	public @ResponseBody void update(HttpServletRequest request, HttpServletResponse response) 
-				throws IOException, DataModelException {
+	public @ResponseBody void update(HttpServletRequest request, HttpServletResponse response,  
+			@PathVariable Long id) throws IOException, DataModelException {
 		logger.debug("Requesting cliente update");
 		Cliente o = null;
 		try {
@@ -121,6 +121,8 @@ public class ClienteController {
 			logger.debug("Deserialization: can not get a valid cliente from request body.");
 			throw new InvalidResourceParameterException();
 		}
+		if (!o.getId().equals(id))
+			throw new InvalidResourceParameterException("Id mismatch");
 		// Actualizar el cliente
 		o = dataService.save(o);
 		// Se devuelve en la respuesta el cliente actualizado.
@@ -129,23 +131,11 @@ public class ClienteController {
 	}
 	
 	@RequestMapping(value="/{id}", method=RequestMethod.DELETE)
-	public @ResponseBody void delete(HttpServletRequest request, HttpServletResponse response) 
+	public @ResponseBody void delete(HttpServletResponse response, @PathVariable Long id) 
 				throws IOException, DataModelException {
-		logger.debug("Requesting cliente delete");
-		Cliente o = null;
-		try {
-			o = serializationService.read(request.getInputStream(), Cliente.class);
-		} catch (IOException ioe) {
-			// No se ha podido parsear el cliente a Eliminar. Generar bad request
-			logger.debug("Deserialization: can not get a valid cliente from request body.");
-			throw ioe;
-		}
-		if (o==null) {
-			logger.debug("Deserialization: can not get a valid cliente from request body.");
-			throw new InvalidResourceParameterException();
-		}
-		// Actualizar el cliente
-		dataService.remove(o);
+		logger.debug("Requesting cliente delete id={}",id);
+		// Borrar el cliente
+		Cliente o = dataService.remove(id);
 		// Se devuelve en la respuesta el cliente borrado.
 		serializationService.write(response.getOutputStream(), o);
 		logger.debug("delete Cliente: deleted cliente returned successfully.");

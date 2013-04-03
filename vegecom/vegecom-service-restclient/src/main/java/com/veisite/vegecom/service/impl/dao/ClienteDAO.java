@@ -72,14 +72,13 @@ public class ClienteDAO {
 		return tp.execute(url, HttpMethod.PUT, cb, ex, cliente.getId());
 	}
 
-	public void remove(Cliente cliente) {
+	public Cliente remove(Long id) {
 		RestTemplate tp = restService.createRestTemplate();
 		String url = restService.getBaseURL()+ENTRYPOINT_URL+"/{id}";
-		RequestCallback cb = 
-			new ObjectRequestFiller<Cliente>(serializationService, cliente);
+		RequestCallback cb = null;
 		ResponseExtractor<Cliente> ex = 
 			new ObjectResponseExtractor<Cliente>(serializationService, Cliente.class);
-		tp.execute(url, HttpMethod.DELETE, cb, ex, cliente.getId());
+		return tp.execute(url, HttpMethod.DELETE, cb, ex, id);
 	}
 	
 	/**
@@ -110,6 +109,7 @@ public class ClienteDAO {
 				new ObjectFlowResponseExtractor<Cliente>(serializationService, output, Cliente.class);
 		logger.debug("Quering server for Cliente List...");
 		tp.execute(url, HttpMethod.GET, cb, ex);
+		output.close();
 		logger.debug("Reading cliente has ended correctly, exiting...");
 	}
 

@@ -24,7 +24,8 @@ public class ProveedorDAO {
 		return proveedor;
 	}
 
-	public void remove(Proveedor proveedor) {
+	public Proveedor remove(Long id) {
+		return null;
 	}
 	
 	/**

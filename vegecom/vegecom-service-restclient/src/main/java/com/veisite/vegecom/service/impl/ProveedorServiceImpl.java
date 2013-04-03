@@ -27,9 +27,10 @@ public class ProveedorServiceImpl extends TerceroServiceImpl<Proveedor> implemen
 	}
 
 	@Override
-	public void remove(Proveedor proveedor) {
-		dao.remove(proveedor);
-		fireItemRemovedEvent(proveedor);
+	public Proveedor remove(Long id) {
+		Proveedor p = dao.remove(id);
+		fireItemRemovedEvent(p);
+		return p;
 	}
 
 	@Override

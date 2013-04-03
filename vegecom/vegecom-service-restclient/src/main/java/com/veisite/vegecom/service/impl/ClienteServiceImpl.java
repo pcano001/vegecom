@@ -27,9 +27,10 @@ public class ClienteServiceImpl extends TerceroServiceImpl<Cliente> implements C
 	}
 
 	@Override
-	public void remove(Cliente cliente) {
-		dao.remove(cliente);
-		fireItemRemovedEvent(cliente);
+	public Cliente remove(Long id) {
+		Cliente c = dao.remove(id);
+		fireItemRemovedEvent(c);
+		return c;
 	}
 
 	@Override

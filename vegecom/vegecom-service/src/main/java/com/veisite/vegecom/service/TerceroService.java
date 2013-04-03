@@ -10,7 +10,7 @@ public abstract interface TerceroService<T extends TerceroComercial> {
 
 	public T save(T terceroComercial);
 	
-	public void remove(T terceroComercial);
+	public T remove(Long id);
 	
 	public T getById(Long id);
 

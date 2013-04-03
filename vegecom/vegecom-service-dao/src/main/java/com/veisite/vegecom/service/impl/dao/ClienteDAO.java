@@ -41,10 +41,10 @@ public class ClienteDAO {
 		return cliente;
 	}
 
-	public void remove(Cliente cliente) {
-		if (cliente.getId()==null) return;
-		cliente = (Cliente) em.find(Cliente.class, cliente.getId());
+	public Cliente remove(Long id) {
+		Cliente cliente = getById(id);
 		if (cliente!=null) em.remove(cliente);
+		return cliente;
 	}
 	
 	/**
