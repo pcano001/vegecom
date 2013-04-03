@@ -92,7 +92,7 @@ public class VTextField extends JXTextField implements IActivableComponent, IVal
                 }
             }
         });
-		String il = "com.veisite.vegecom.ui.framework.component.images.emblem-important-316.png";
+		String il = "images/emblem-important-316.png";
 		ImageIcon im = new ImageIcon(getClass().getResource(il));
 		if (im!=null) validationBuddy = new JLabel(im);
 	}
