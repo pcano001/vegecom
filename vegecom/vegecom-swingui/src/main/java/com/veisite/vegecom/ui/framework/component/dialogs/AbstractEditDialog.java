@@ -10,7 +10,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
-import java.util.ResourceBundle;
+import java.util.Locale;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -18,6 +18,9 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+
+import org.springframework.context.MessageSource;
+import org.springframework.util.Assert;
 
 /**
  * Dialog simple que muestra un boton de cerrar en la parte baja
@@ -78,7 +81,7 @@ public abstract class AbstractEditDialog extends JDialog {
 	/**
 	 * Mensajes de texto
 	 */
-	protected ResourceBundle resourceBundle;
+	protected MessageSource messageSource;
 
 	/**
 	 * Compoente a añadir al dialogo
@@ -86,26 +89,26 @@ public abstract class AbstractEditDialog extends JDialog {
 	JPanel contentPanel;
 	private Component contentComponent;
 
-	public AbstractEditDialog(Dialog owner, ResourceBundle resourceBundle) {
+	public AbstractEditDialog(Dialog owner, MessageSource messageSource) {
 		super(owner);
-		this.resourceBundle = resourceBundle;
+		this.messageSource = messageSource;
 		initDialog();
 	}
 
-	public AbstractEditDialog(Frame owner, ResourceBundle resourceBundle) {
+	public AbstractEditDialog(Frame owner, MessageSource messageSource) {
 		super(owner);
-		this.resourceBundle = resourceBundle;
+		this.messageSource = messageSource;
 		initDialog();
 	}
 	
-	public AbstractEditDialog(Window owner, ResourceBundle resourceBundle) {
+	public AbstractEditDialog(Window owner, MessageSource messageSource) {
 		super(owner);
-		this.resourceBundle = resourceBundle;
+		this.messageSource = messageSource;
 		initDialog();
 	}
 	
-	public AbstractEditDialog(Component parent, ResourceBundle resourceBundle) {
-		this(SwingUtilities.getWindowAncestor(parent), resourceBundle);
+	public AbstractEditDialog(Component parent, MessageSource messageSource) {
+		this(SwingUtilities.getWindowAncestor(parent), messageSource);
 	}
 	
 	
@@ -135,6 +138,7 @@ public abstract class AbstractEditDialog extends JDialog {
 	}
 
 	private void initDialog() {
+		Assert.notNull(messageSource);
 		enableEvents(AWTEvent.WINDOW_EVENT_MASK);
 		
 		ActionListener bl = new ActionListener() {
@@ -151,16 +155,11 @@ public abstract class AbstractEditDialog extends JDialog {
 		if (contentComponent!=null)
 			contentPanel.add(contentComponent, BorderLayout.CENTER);
 		
-		String s = "Ok";
-		if (resourceBundle!=null && resourceBundle.containsKey(OK_BUTTON_MESSAGE_KEY)) {
-			s = resourceBundle.getString(OK_BUTTON_MESSAGE_KEY);
-		}
+		String s;
+		s = messageSource.getMessage(OK_BUTTON_MESSAGE_KEY,null,"Ok",Locale.getDefault());
 		okButton = new JButton(s);
 		okButton.addActionListener(bl);
-		s = "Cancel";
-		if (resourceBundle!=null && resourceBundle.containsKey(CANCEL_BUTTON_MESSAGE_KEY)) {
-			s = resourceBundle.getString(CANCEL_BUTTON_MESSAGE_KEY);
-		}
+		s = messageSource.getMessage(CANCEL_BUTTON_MESSAGE_KEY,null,"Cancel",Locale.getDefault());
 		cancelButton = new JButton(s);
 		cancelButton.addActionListener(bl);
 
@@ -261,14 +260,12 @@ public abstract class AbstractEditDialog extends JDialog {
 	 */
 	private boolean wantDiscardChanges() {
 		if (!isContentDirty()) return true;
-		String q = "Do you want to discard changes?";
-		if (resourceBundle!=null && resourceBundle.containsKey(DISCARDCHANGE_QUESTION_MESSAGE_KEY)) {
-			q = resourceBundle.getString(DISCARDCHANGE_QUESTION_MESSAGE_KEY);
-		}
-		String t = "Cancel changes";
-		if (resourceBundle!=null && resourceBundle.containsKey(DISCARDCHANGE_TITLE_MESSAGE_KEY)) {
-			t = resourceBundle.getString(DISCARDCHANGE_TITLE_MESSAGE_KEY);
-		}
+		String q;
+		q = messageSource.getMessage(DISCARDCHANGE_QUESTION_MESSAGE_KEY, null, 
+						"Do you want to discard changes?",Locale.getDefault());
+		String t;
+		t = messageSource.getMessage(DISCARDCHANGE_TITLE_MESSAGE_KEY, null, 
+				"Cancel changes",Locale.getDefault());
 		/* Pedir confirmación de cierre */
 		int confirm = 
 			JOptionPane.showConfirmDialog(this, q, t, JOptionPane.YES_NO_OPTION);

@@ -4,6 +4,8 @@ import java.awt.Window;
 
 import javax.validation.Validator;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.MessageSource;
 import org.springframework.util.Assert;
 
 import com.veisite.vegecom.ui.framework.module.UIFrameworkModule;
@@ -35,6 +37,14 @@ public abstract class UIFrameworkAbstractService implements UIFrameworkService {
 		return uiModule.getValidator();
 	}
 
+	public MessageSource getMessageSource() {
+		return uiModule.getMessageSource();
+	}
+	
+	public ApplicationContext getContext() {
+		return uiModule.getContext();
+	}
+	
 	/* (non-Javadoc)
 	 * @see com.veisite.vegecom.ui.framework.service.UIFrameworkService#getParentWindow()
 	 */

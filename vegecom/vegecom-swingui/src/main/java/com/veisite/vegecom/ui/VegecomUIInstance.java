@@ -18,8 +18,7 @@ import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.context.MessageSource;
 
 import com.veisite.utils.tasks.ProgressEvent;
 import com.veisite.utils.tasks.ProgressEventListener;
@@ -36,8 +35,10 @@ import com.veisite.vegecom.ui.context.SpringContextLoader;
 import com.veisite.vegecom.ui.framework.UIFrameworkInstance;
 import com.veisite.vegecom.ui.framework.menu.UIFrameworkMenuBar;
 import com.veisite.vegecom.ui.framework.menu.UIFrameworkMenuItem;
+import com.veisite.vegecom.ui.framework.util.UIResources;
 import com.veisite.vegecom.ui.framework.util.WindowUtilities;
 import com.veisite.vegecom.ui.framework.views.UIFrameworkView;
+import com.veisite.vegecom.ui.tercero.cliente.ClienteUIModule;
 
 public class VegecomUIInstance extends UIFrameworkInstance {
 
@@ -89,9 +90,8 @@ public class VegecomUIInstance extends UIFrameworkInstance {
 	 * 		the id of the instance
 	 * @param resourceBundleMessageSource 
 	 */
-	public VegecomUIInstance(String id, boolean productionMode, 
-			ResourceBundleMessageSource resourceBundleMessageSource) {
-		super(id, resourceBundleMessageSource);
+	public VegecomUIInstance(String id, boolean productionMode,	MessageSource messageSource) {
+		super(id, messageSource);
 		this.productionMode = productionMode;
 		String title = getMessage("ui.ApplicationFrame.Title", null, "Vegecom Application");
 		if (productionMode) title += 
@@ -148,10 +148,9 @@ public class VegecomUIInstance extends UIFrameworkInstance {
 		//loginTabPanel.setPreferredSize(DIMENSION_MAXIMA_JFRAME_PRINCIPAL);
 		
 		// Lanzamos configuracion de contexto.
-		final String[] configSpringPaths = {"META-INF/spring/applicationContext_pru.xml"};
-		if (productionMode) {
-			configSpringPaths[0] = "META-INF/spring/applicationContext_pro.xml";
-		}
+		final String[] configSpringPaths = 
+			{"META-INF/spring/applicationContext.xml",
+			 "META-INF/spring/applicationContext-restClient.xml"	};
 		final SpringContextLoader cl = new SpringContextLoader(configSpringPaths);
 		cl.addEventListener(new ProgressEventListener() {
 			@Override
@@ -183,7 +182,7 @@ public class VegecomUIInstance extends UIFrameworkInstance {
 					}
 					setContext(cl.getContext());
 					/* Inicializamos recurso de mensajes */
-					setResourceBundle((ResourceBundleMessageSource) cl.getContext().getBean("clientMessageSource"));
+					setMessageSource((MessageSource) cl.getContext().getBean("messageSource"));
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
 						public void run() {
@@ -255,7 +254,7 @@ public class VegecomUIInstance extends UIFrameworkInstance {
 			return;
 		}
 		
-		// Recuperar servicios de seguridad y auditoria
+		// Recuperar servicios de seguridad
 		if (ss==null)
 			ss = getContext().getBean(SecurityService.class);
 		try {

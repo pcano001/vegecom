@@ -13,7 +13,6 @@ public class ClienteEditComponent extends TerceroEditComponent<Cliente> {
 
 	public ClienteEditComponent(Cliente tercero, ClienteUIService uiService) {
 		super(tercero, uiService);
-		add(new ClienteSelectTextComponent("Introduzca texto para buscar cliente", uiService));
 	}
 
 }

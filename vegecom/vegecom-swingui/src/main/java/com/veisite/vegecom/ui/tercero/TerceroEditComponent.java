@@ -9,13 +9,21 @@ import javax.swing.JPanel;
 import javax.validation.Validator;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import com.veisite.utils.binding.BindTarget;
 import com.veisite.vegecom.model.Municipio;
 import com.veisite.vegecom.model.Provincia;
 import com.veisite.vegecom.model.TerceroComercial;
+import com.veisite.vegecom.service.AddressService;
+import com.veisite.vegecom.ui.component.VCodigoPostalField;
+import com.veisite.vegecom.ui.component.VCuentaBancariaField;
+import com.veisite.vegecom.ui.component.VMunicipioField;
+import com.veisite.vegecom.ui.component.VNifField;
+import com.veisite.vegecom.ui.component.VProvinciaField;
 import com.veisite.vegecom.ui.framework.component.VTextArea;
 import com.veisite.vegecom.ui.framework.component.VTextField;
+import com.veisite.vegecom.ui.framework.util.UIResources;
 import com.veisite.vegecom.ui.service.TerceroUIService;
 
 public abstract class TerceroEditComponent<T extends TerceroComercial> extends JPanel {
@@ -50,20 +58,23 @@ public abstract class TerceroEditComponent<T extends TerceroComercial> extends J
 	 */
 	private TerceroUIService<T> uiService;
 	
+	/**
+	 * Servicio de direcciones
+	 */
+	private AddressService addressService;
+	
 	
 	/**
 	 * Constructor
 	 * @param tercero
 	 */
 	public TerceroEditComponent(T tercero, TerceroUIService<T> uiService) {
-		if (tercero==null) {
-			String m = 
-				uiService.getMessage("com.veisite.vegecom.ui.tercero.TerceroEditPanel.nullTercero", 
-						null, "paramter 'tercero' cannot be null.");
-			throw new IllegalArgumentException(m);
-		}
+		Assert.notNull(tercero);
+		Assert.notNull(uiService);
 		this.tercero = tercero;
 		this.uiService = uiService;
+		this.addressService = uiService.getContext().getBean(AddressService.class);
+		Assert.notNull(this.addressService);
 		createComponents();
 		composePanel();
 		bindComponents();
@@ -99,8 +110,8 @@ public abstract class TerceroEditComponent<T extends TerceroComercial> extends J
 		s =	uiService.getMessage("ui.tercero.TerceroEditPanel.codigoPostalPrompt", null, "C.P.");
 		cpField = new VCodigoPostalField(s);
 		cpField.setColumns(4);
-		provinciaField = new VProvinciaField();
-		municipioField = new VMunicipioField(provinciaField);
+		provinciaField = new VProvinciaField(addressService);
+		municipioField = new VMunicipioField(provinciaField,addressService);
 		s =	uiService.getMessage("ui.tercero.TerceroEditPanel.localidadPrompt", null, "Village/Town");
 		localidadField = new VTextField(s);
 		localidadField.setColumns(25);

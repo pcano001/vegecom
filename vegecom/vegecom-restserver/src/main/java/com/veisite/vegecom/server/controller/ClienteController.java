@@ -20,6 +20,7 @@ import com.veisite.vegecom.model.exception.DataModelException;
 import com.veisite.vegecom.model.exception.InvalidResourceParameterException;
 import com.veisite.vegecom.model.exception.NewResourceWithExplicitIdException;
 import com.veisite.vegecom.model.exception.ResourceNotFoundException;
+import com.veisite.vegecom.rest.server.ObjectFlowWriter;
 import com.veisite.vegecom.service.ClienteService;
 import com.veisite.vegecom.service.SerializationService;
 

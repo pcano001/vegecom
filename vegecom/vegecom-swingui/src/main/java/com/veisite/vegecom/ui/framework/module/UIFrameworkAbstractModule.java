@@ -5,6 +5,7 @@ import java.awt.Window;
 import javax.validation.Validator;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.MessageSource;
 import org.springframework.util.Assert;
 
 import com.veisite.vegecom.ui.framework.UIFrameworkInstance;
@@ -44,6 +45,14 @@ public abstract class UIFrameworkAbstractModule implements UIFrameworkModule {
 	@Override
 	public Window getParentWindow() {
 		return uiInstance;
+	}
+	
+	public ApplicationContext getContext() {
+		return this.context;
+	}
+	
+	public MessageSource getMessageSource() {
+		return uiInstance.getMessageSource();
 	}
 
 }

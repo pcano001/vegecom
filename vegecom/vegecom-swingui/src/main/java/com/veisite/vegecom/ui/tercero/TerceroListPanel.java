@@ -69,7 +69,7 @@ public abstract class TerceroListPanel<T extends TerceroComercial> extends UIFra
 		TerceroListTableModel<T> dataModel = uiService.getListTableModel();
 		TerceroListJTable<T> table =
 				new TerceroListJTable<T>(dataModel);
-		tablePanel = new AbstractListTablePanel<T>(this,table) {
+		tablePanel = new AbstractListTablePanel<T>(this,table,uiService.getMessageSource()) {
 			private static final long serialVersionUID = 1L;
 			@Override
 			protected void doubleClickOnTable() {

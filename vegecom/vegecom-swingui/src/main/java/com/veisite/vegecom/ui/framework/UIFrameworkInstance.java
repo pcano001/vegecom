@@ -15,7 +15,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.context.MessageSource;
 
 import com.veisite.vegecom.ui.framework.menu.UIFrameworkMenuBar;
 import com.veisite.vegecom.ui.framework.module.UIFrameworkModuleManager;
@@ -57,7 +57,7 @@ public class UIFrameworkInstance extends JFrame implements WindowListener {
 	/**
 	 * Recurso para internacionalizacion
 	 */
-	protected ResourceBundleMessageSource resourceBundle;
+	protected MessageSource messageSource;
 	
 	/**
 	 * Barra de menu principal
@@ -97,10 +97,10 @@ public class UIFrameworkInstance extends JFrame implements WindowListener {
 	protected Validator validator;
 	
 	
-	public UIFrameworkInstance(String id, ResourceBundleMessageSource resourceBundleMessageSource) {
+	public UIFrameworkInstance(String id, MessageSource messageSource) {
 		super();
 		this.id = id;
-		this.resourceBundle = resourceBundleMessageSource;
+		this.messageSource = messageSource;
 		initFramework();
 	}
 	
@@ -231,12 +231,12 @@ public class UIFrameworkInstance extends JFrame implements WindowListener {
 		this.context = context;
 	}
 
-	public ResourceBundleMessageSource getResourceBundle() {
-		return resourceBundle;
+	public MessageSource getMessageSource() {
+		return messageSource;
 	}
 
-	public void setResourceBundle(ResourceBundleMessageSource resourceBundle) {
-		this.resourceBundle = resourceBundle;
+	public void setMessageSource(MessageSource messageSource) {
+		this.messageSource = messageSource;
 	}
 
 	/**
@@ -275,7 +275,7 @@ public class UIFrameworkInstance extends JFrame implements WindowListener {
 	}
 
 	public String getMessage(String code, Object[] args, String defaultMessage) {
-		return resourceBundle.getMessage(code, args, defaultMessage, Locale.getDefault());
+		return messageSource.getMessage(code, args, defaultMessage, Locale.getDefault());
 	}
 
 	/**

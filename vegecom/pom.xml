@@ -53,5 +53,6 @@
     <module>vegecom-restjson</module>
     <module>vegecom-restserver</module>
     <module>vegecom-swingui</module>
+    <module>vegecom-service-restclient</module>
   </modules>
 </project>

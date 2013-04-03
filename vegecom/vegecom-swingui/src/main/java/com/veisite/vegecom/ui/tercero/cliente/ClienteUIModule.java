@@ -16,8 +16,10 @@ import com.veisite.vegecom.ui.framework.menu.UIFrameworkMenu;
 import com.veisite.vegecom.ui.framework.menu.UIFrameworkMenuBar;
 import com.veisite.vegecom.ui.framework.menu.UIFrameworkMenuItem;
 import com.veisite.vegecom.ui.framework.module.UIFrameworkAbstractModule;
+import com.veisite.vegecom.ui.framework.util.UIResources;
 import com.veisite.vegecom.ui.framework.views.UIFrameworkView;
 import com.veisite.vegecom.ui.service.ClienteUIService;
+import com.veisite.vegecom.ui.service.impl.ClienteUIServiceImpl;
 
 public class ClienteUIModule extends UIFrameworkAbstractModule {
 	

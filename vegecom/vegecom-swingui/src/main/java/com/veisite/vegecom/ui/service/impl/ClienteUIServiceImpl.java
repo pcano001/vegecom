@@ -11,6 +11,7 @@ import org.jdesktop.swingx.error.ErrorInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.DataAccessException;
 import org.springframework.util.Assert;
 
 import com.veisite.vegecom.model.Cliente;
@@ -203,7 +204,7 @@ public class ClienteUIServiceImpl extends UIFrameworkAbstractService
 		Assert.notNull(dataService);
 		if (listModel == null) {
 			ClienteListProvider dataProvider = new ClienteListProvider(dataService);
-			listModel = new TerceroLisTableModel<Cliente>(dataProvider, this);
+			listModel = new TerceroListTableModel<Cliente>(dataProvider, this);
 			listModel.refreshData();
 		}
 		return this.listModel;

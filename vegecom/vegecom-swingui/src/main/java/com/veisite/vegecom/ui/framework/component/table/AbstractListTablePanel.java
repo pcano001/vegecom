@@ -11,8 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.text.DecimalFormat;
-import java.text.MessageFormat;
-import java.util.ResourceBundle;
+import java.util.Locale;
 
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
@@ -29,6 +28,7 @@ import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
 
 import com.veisite.vegecom.model.exception.VegecomException;
 import com.veisite.vegecom.ui.framework.component.panels.DefaultTableStatusBar;
@@ -65,7 +65,7 @@ public abstract class AbstractListTablePanel<T> extends JPanel {
 	/**
 	 * Recursos de mensajes i18n
 	 */
-	private ResourceBundle resourceBundle;
+	private MessageSource messageSource;
 	
 	/**
 	 * Variable y recursos de cadena
@@ -111,9 +111,7 @@ public abstract class AbstractListTablePanel<T> extends JPanel {
 	 * Variables de mensajes de texto
 	 */
 	private String loadingText = "Loading...";
-	private MessageFormat totalRowText = new MessageFormat("Total: {0} rows");
 	private String errorText = "Error...";
-	private MessageFormat selectedRowText = new MessageFormat("{0} rows ({1} selected)");
 	private String refreshTextMenu = "Refresh data";
 	private String exportTextMenu = "Export data";
 	private String exportOdsTextMenu = "ODS format";
@@ -122,11 +120,11 @@ public abstract class AbstractListTablePanel<T> extends JPanel {
 	
 	
 	public AbstractListTablePanel(Component parent, AbstractListJTable<T> table, 
-			ResourceBundle resourceBundle) throws  VegecomException {
+			MessageSource messageSource) throws  VegecomException {
 		super();
 		this.parent = parent;
 		this.table = table;
-		this.resourceBundle = resourceBundle;
+		this.messageSource = messageSource;
 		initComponent();
 	}
 	
@@ -144,24 +142,22 @@ public abstract class AbstractListTablePanel<T> extends JPanel {
 		statusBar = new DefaultTableStatusBar();
 		showStatusBar();
 		
-		if (resourceBundle!=null && resourceBundle.containsKey(LOADING_MESSAGE_KEY))
-			loadingText = resourceBundle.getString(LOADING_MESSAGE_KEY);
-		if (resourceBundle!=null && resourceBundle.containsKey(TOTALROW_MESSAGE_KEY))
-			totalRowText = new MessageFormat(resourceBundle.getString(TOTALROW_MESSAGE_KEY));
-		if (resourceBundle!=null && resourceBundle.containsKey(ERROR_MESSAGE_KEY))
-			errorText = resourceBundle.getString(ERROR_MESSAGE_KEY);
-		if (resourceBundle!=null && resourceBundle.containsKey(SELECTEDROW_MESSAGE_KEY))
-			selectedRowText = new MessageFormat(resourceBundle.getString(SELECTEDROW_MESSAGE_KEY));
-		if (resourceBundle!=null && resourceBundle.containsKey(REFRESH_MENU_KEY))
-			refreshTextMenu = resourceBundle.getString(REFRESH_MENU_KEY);
-		if (resourceBundle!=null && resourceBundle.containsKey(EXPORT_MENU_KEY))
-			exportTextMenu = resourceBundle.getString(EXPORT_MENU_KEY);
-		if (resourceBundle!=null && resourceBundle.containsKey(EXPORTODS_MENU_KEY))
-			exportOdsTextMenu = resourceBundle.getString(EXPORTODS_MENU_KEY);
-		if (resourceBundle!=null && resourceBundle.containsKey(EXPORTXLS_MENU_KEY))
-			exportXlsTextMenu = resourceBundle.getString(EXPORTXLS_MENU_KEY);
-		if (resourceBundle!=null && resourceBundle.containsKey(EXPORTERROR_MESSAGE_KEY))
-			exportErrorText = resourceBundle.getString(EXPORTERROR_MESSAGE_KEY);
+		if (messageSource!=null) {
+			loadingText = 
+				messageSource.getMessage(LOADING_MESSAGE_KEY,null,loadingText,Locale.getDefault());
+			errorText = 
+				messageSource.getMessage(ERROR_MESSAGE_KEY,null,errorText,Locale.getDefault());
+			refreshTextMenu = 
+				messageSource.getMessage(REFRESH_MENU_KEY,null,refreshTextMenu,Locale.getDefault());
+			exportTextMenu = 
+				messageSource.getMessage(EXPORT_MENU_KEY,null,exportTextMenu,Locale.getDefault());
+			exportOdsTextMenu = 
+				messageSource.getMessage(EXPORTODS_MENU_KEY,null,exportOdsTextMenu,Locale.getDefault());
+			exportXlsTextMenu = 
+				messageSource.getMessage(EXPORTXLS_MENU_KEY,null,exportXlsTextMenu,Locale.getDefault());
+			exportErrorText = 
+				messageSource.getMessage(EXPORTERROR_MESSAGE_KEY,null,exportErrorText,Locale.getDefault());
+		}
 		
 		table.getModel().addDataLoadListener(new DataLoadListener() {
 			@Override
@@ -172,7 +168,9 @@ public abstract class AbstractListTablePanel<T> extends JPanel {
 			@Override
 			public void dataLoadEnd() {
 				statusBar.stopProgress();
-				String s = totalRowText.format(new Object[] {df.format(table.getModel().getRowCount())});
+				Object[] args = {df.format(table.getModel().getRowCount())};
+				String s = 
+					messageSource.getMessage(TOTALROW_MESSAGE_KEY,args,"Total: {0} rows",Locale.getDefault());
 				statusBar.setProgressText(s);
 				updateStatusBar();
 			}
@@ -206,7 +204,9 @@ public abstract class AbstractListTablePanel<T> extends JPanel {
 
 	public void updateStatusBar() {
 		Object[] args = {df.format(table.getRowCount()),df.format(table.getSelectedRowCount())};
-		statusBar.setText(selectedRowText.format(args));
+		String s = 
+			messageSource.getMessage(SELECTEDROW_MESSAGE_KEY,args,"{0} rows ({1} selected)",Locale.getDefault());
+		statusBar.setText(s);
 	}
 	
 	/**

@@ -16,6 +16,7 @@ import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 
 import com.veisite.vegecom.model.Cliente;
 import com.veisite.vegecom.service.ClienteService;
@@ -52,28 +53,28 @@ public class ClienteEditDialog extends AbstractEditDialog {
 	
 	
 	public ClienteEditDialog(Dialog owner, Cliente cliente, ClienteUIService uiService) {
-		super(owner, uiService);
+		super(owner, uiService.getMessageSource());
 		this.cliente = cliente;
 		this.uiService = uiService;
 		initializeDialog();
 	}
 
 	public ClienteEditDialog(Frame owner, Cliente cliente, ClienteUIService uiService) {
-		super(owner);
+		super(owner,uiService.getMessageSource());
 		this.cliente = cliente;
 		this.uiService = uiService;
 		initializeDialog();
 	}
 
 	public ClienteEditDialog(Window owner, Cliente cliente, ClienteUIService uiService) {
-		super(owner);
+		super(owner,uiService.getMessageSource());
 		this.cliente = cliente;
 		this.uiService = uiService;
 		initializeDialog();
 	}
 
 	public ClienteEditDialog(Component parent, Cliente cliente, ClienteUIService uiService) {
-		super(parent);
+		super(parent,uiService.getMessageSource());
 		this.cliente = cliente;
 		this.uiService = uiService;
 		initializeDialog();
