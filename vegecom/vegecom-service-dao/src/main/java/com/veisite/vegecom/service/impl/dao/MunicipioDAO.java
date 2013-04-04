@@ -81,7 +81,6 @@ public class MunicipioDAO {
 			output.write(m);
 		}
 		sc.close();
-		output.close();
 		logger.debug("Writing municipio has ended correctly, exiting...");
 	}
 

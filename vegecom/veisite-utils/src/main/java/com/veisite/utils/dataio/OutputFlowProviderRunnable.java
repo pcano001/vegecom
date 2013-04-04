@@ -6,8 +6,19 @@ public abstract class OutputFlowProviderRunnable<T> implements Runnable {
 	
 	protected ObjectOutputFlow<T> output;
 
-	public abstract void run();
+	public abstract void doWrite();
 	
+	@Override
+	public void run() {
+		if (output==null)
+			throw new NullPointerException("output flow is not set yet");
+		try {
+			doWrite();
+		} finally {
+			output.close();
+		}
+	}
+
 	public Throwable getError() {
 		return error;
 	}

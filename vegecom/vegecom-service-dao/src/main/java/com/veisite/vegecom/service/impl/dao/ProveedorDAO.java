@@ -87,7 +87,6 @@ public class ProveedorDAO {
 			output.write(p);
 		} while (sc.next());
 		sc.close();
-		output.close();
 		logger.debug("Writing Proveedor list has ended correctly, exiting...");
 	}
 

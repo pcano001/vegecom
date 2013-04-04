@@ -94,7 +94,7 @@ public class VegecomUIInstance extends UIFrameworkInstance {
 		super(id, messageSource);
 		this.productionMode = productionMode;
 		String title = getMessage("ui.ApplicationFrame.Title", null, "Vegecom Application");
-		if (productionMode) title += 
+		if (this.productionMode) title += 
 				getMessage("ui.ApplicationFrame.TitleTestMode", null, " (Runnig in test mode)");
 		setTitle(title);
 		getViewArea().setPreferredSize(DIMENSION_MAXIMA_JFRAME_PRINCIPAL);

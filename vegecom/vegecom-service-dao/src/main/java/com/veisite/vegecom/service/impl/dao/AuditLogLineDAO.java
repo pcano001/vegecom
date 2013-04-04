@@ -56,7 +56,6 @@ public class AuditLogLineDAO {
 			output.write(l);
 		} while (sc.next());
 		sc.close();
-		output.close();
 		logger.debug("Writing AuditLog has ended correctly, exiting...");
 	}
 

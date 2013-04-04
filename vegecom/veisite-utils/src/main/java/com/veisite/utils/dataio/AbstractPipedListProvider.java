@@ -119,8 +119,10 @@ public abstract class AbstractPipedListProvider<T> extends ObjectFlowProvider<T>
 				try {
 					writeOutputStream(output);
 				} catch (Throwable t) {
-					output.close();
 					setOutputError(t);
+				} finally {
+					// We open, we close
+					output.close();
 				}
 			}
 		});

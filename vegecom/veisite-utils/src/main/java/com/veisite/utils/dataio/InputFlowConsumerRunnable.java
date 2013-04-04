@@ -6,7 +6,17 @@ public abstract class InputFlowConsumerRunnable<T> implements Runnable {
 	
 	protected ObjectInputFlow<T> input;
 
-	public abstract void run();
+	public abstract void doRead();
+
+	public void run() {
+		if (input==null)
+			throw new NullPointerException("input flow is not set yet");
+		try {
+			doRead();
+		} finally {
+			input.close();
+		}
+	}
 	
 	public Throwable getError() {
 		return error;

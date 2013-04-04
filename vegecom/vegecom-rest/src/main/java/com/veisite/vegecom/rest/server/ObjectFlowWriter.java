@@ -30,11 +30,13 @@ public class ObjectFlowWriter<T> {
 		this.writer = writer;
 	}
 	
-	public void doWrite() throws IOException {
+	public void doWrite() throws Throwable {
+		PipedObjectInputFlow<T> input = null;
+		PipedObjectOutputFlow<T> output = null;
 		try {
+			input = new PipedObjectInputFlow<T>();
+			output = new PipedObjectOutputFlow<T>(input);
 			// Creamos la tuberia de datos para escribir los objeto del proveedor
-			final PipedObjectInputFlow<T> input = new PipedObjectInputFlow<T>();
-			final PipedObjectOutputFlow<T> output = new PipedObjectOutputFlow<T>(input);
 			input.connect(output);
 			provider.setOutput(output);
 			
@@ -47,10 +49,13 @@ public class ObjectFlowWriter<T> {
 			serializationService.writeObjectStream(writer, input);
 		} catch (DataIOException dioe) {
 			throw new IOException(dioe);
+		} finally {
+			// We open, we close, Provider close the output
+			input.close();
 		}
 		// Si el proveedor tuvo un error en la generacion de objetos lo reportamos.
 		if (provider.getError()!=null)
-			throw new IOException(provider.getError());
+			throw provider.getError();
 	}
 
 }

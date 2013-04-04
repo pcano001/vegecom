@@ -6,7 +6,6 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.Assert;
 import org.springframework.web.client.ResponseExtractor;
 
-import com.veisite.utils.dataio.DataIOException;
 import com.veisite.utils.dataio.ObjectOutputFlow;
 import com.veisite.vegecom.service.SerializationService;
 
@@ -47,11 +46,7 @@ public class ObjectFlowResponseExtractor<T> implements ResponseExtractor<T> {
 	
 	@Override
 	public T extractData(ClientHttpResponse response) throws IOException {
-		try {
-			serializationService.readObjectStream(response.getBody(), output, type);
-		} catch (DataIOException dioe) {
-			throw new IOException(dioe);
-		}
+		serializationService.readObjectStream(response.getBody(), output, type);
 		return null;
 	}
 

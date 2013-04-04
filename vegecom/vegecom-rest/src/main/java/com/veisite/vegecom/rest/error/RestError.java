@@ -8,41 +8,55 @@ public class RestError {
     private final HttpStatus status;
     private final int code;
     private final String message;
-    private final String developerMessage;
+    private final String htmlMessage;
+    private final String debugHtmlMessage;
     private final String moreInfoUrl;
 
-    public RestError(HttpStatus status, int code, String message, String developerMessage, String moreInfoUrl) {
+    public RestError(HttpStatus status, int code, String message, String htmlMessage, 
+    		String debugHtmlMessage, String moreInfoUrl) {
         if (status == null) {
             throw new NullPointerException("HttpStatus argument cannot be null.");
         }
         this.status = status;
         this.code = code;
         this.message = message;
-        this.developerMessage = developerMessage;
+        this.htmlMessage = htmlMessage;
+        this.debugHtmlMessage = debugHtmlMessage;
         this.moreInfoUrl = moreInfoUrl;
     }
 
+
     public HttpStatus getStatus() {
-        return status;
-    }
+		return status;
+	}
 
-    public int getCode() {
-        return code;
-    }
 
-    public String getMessage() {
-        return message;
-    }
+	public int getCode() {
+		return code;
+	}
 
-    public String getDeveloperMessage() {
-        return developerMessage;
-    }
 
-    public String getMoreInfoUrl() {
-        return moreInfoUrl;
-    }
+	public String getMessage() {
+		return message;
+	}
 
-    @Override
+
+	public String getHtmlMessage() {
+		return htmlMessage;
+	}
+
+
+	public String getDebugHtmlMessage() {
+		return debugHtmlMessage;
+	}
+
+
+	public String getMoreInfoUrl() {
+		return moreInfoUrl;
+	}
+
+
+	@Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -52,7 +66,8 @@ public class RestError {
             return ObjectUtils.nullSafeEquals(getStatus(), re.getStatus()) &&
                     getCode() == re.getCode() &&
                     ObjectUtils.nullSafeEquals(getMessage(), re.getMessage()) &&
-                    ObjectUtils.nullSafeEquals(getDeveloperMessage(), re.getDeveloperMessage()) &&
+                    ObjectUtils.nullSafeEquals(getHtmlMessage(), re.getHtmlMessage()) &&
+                    ObjectUtils.nullSafeEquals(getDebugHtmlMessage(), re.getDebugHtmlMessage()) &&
                     ObjectUtils.nullSafeEquals(getMoreInfoUrl(), re.getMoreInfoUrl());
         }
         return false;
@@ -62,7 +77,7 @@ public class RestError {
     public int hashCode() {
         //noinspection ThrowableResultOfMethodCallIgnored
         return ObjectUtils.nullSafeHashCode(new Object[]{
-                getStatus(), getCode(), getMessage(), getDeveloperMessage(), getMoreInfoUrl()
+                getStatus(), getCode(), getMessage(), getHtmlMessage(), getDebugHtmlMessage(), getMoreInfoUrl()
         });
     }
 

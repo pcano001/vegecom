@@ -22,6 +22,7 @@ import org.jdesktop.swingx.prompt.BuddySupport;
 import com.veisite.utils.binding.BindTarget;
 import com.veisite.utils.binding.IBindableTo;
 import com.veisite.vegecom.ui.framework.component.util.IValidatableComponent;
+import com.veisite.vegecom.ui.framework.util.UIResources;
 
 public class VTextField extends JXTextField implements IActivableComponent, IValidatableComponent,  
 														IBindableTo<String> {
@@ -92,8 +93,7 @@ public class VTextField extends JXTextField implements IActivableComponent, IVal
                 }
             }
         });
-		String il = "images/emblem-important-316.png";
-		ImageIcon im = new ImageIcon(getClass().getResource(il));
+		ImageIcon im = UIResources.getIcon16("emblem-important-3"); 
 		if (im!=null) validationBuddy = new JLabel(im);
 	}
 

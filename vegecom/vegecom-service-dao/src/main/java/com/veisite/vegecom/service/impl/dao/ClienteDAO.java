@@ -89,7 +89,6 @@ public class ClienteDAO {
 			output.write(c);
 		} while (sc.next());
 		sc.close();
-		output.close();
 		logger.debug("Writing Cliente list has ended correctly, exiting...");
 	}
 

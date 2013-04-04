@@ -109,7 +109,6 @@ public class ClienteDAO {
 				new ObjectFlowResponseExtractor<Cliente>(serializationService, output, Cliente.class);
 		logger.debug("Quering server for Cliente List...");
 		tp.execute(url, HttpMethod.GET, cb, ex);
-		output.close();
 		logger.debug("Reading cliente has ended correctly, exiting...");
 	}
 

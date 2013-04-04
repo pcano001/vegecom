@@ -24,7 +24,7 @@ import com.veisite.vegecom.service.SerializationService;
 
 @Controller
 @RequestMapping("/municipio")
-public class MunicipioController {
+public class MunicipioController extends DefaultController {
 	
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -45,7 +45,7 @@ public class MunicipioController {
 	
 	@RequestMapping(value="/list", method=RequestMethod.GET)
 	public @ResponseBody void getList(@RequestParam(required=false) String provinciaId, 
-									  HttpServletResponse response) throws IOException {
+									  HttpServletResponse response) throws Throwable,IOException {
 		logger.debug("Requesting municipio list with provincId='{}'",provinciaId);
 		Provincia p = null;
 		if (provinciaId!=null) {
@@ -60,11 +60,10 @@ public class MunicipioController {
 		final Provincia provincia = p;
 		OutputFlowProviderRunnable<Municipio> provider = new OutputFlowProviderRunnable<Municipio>() {
 			@Override
-			public void run() {
+			public void doWrite() {
 				try {
 					dataService.getList(output, provincia);
 				} catch (Throwable t) {
-					output.close();
 					error = t;
 				}
 			}

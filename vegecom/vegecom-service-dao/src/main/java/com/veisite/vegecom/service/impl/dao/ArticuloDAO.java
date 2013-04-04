@@ -78,7 +78,6 @@ public class ArticuloDAO {
 			output.write(c);
 		} while (sc.next());
 		sc.close();
-		output.close();
 		logger.debug("Writing Articulo list has ended correctly, exiting...");
 	}
 	

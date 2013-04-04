@@ -72,7 +72,6 @@ public class ClienteUIServiceImpl extends UIFrameworkAbstractService
 		if (dataService==null)
 			throw new VegecomException("ClienteService is not available");
 		dataService.addDataChangeListener(this);
-
 	}
 	
 
