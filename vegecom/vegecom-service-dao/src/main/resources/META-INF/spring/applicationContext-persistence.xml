@@ -4,6 +4,7 @@
        xmlns:jee="http://www.springframework.org/schema/jee" 
        xmlns:tx="http://www.springframework.org/schema/tx" 
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
        xsi:schemaLocation="http://www.springframework.org/schema/beans 
        		http://www.springframework.org/schema/beans/spring-beans-3.1.xsd 
        		http://www.springframework.org/schema/context 
@@ -11,8 +12,12 @@
        		http://www.springframework.org/schema/jee 
        		http://www.springframework.org/schema/jee/spring-jee-3.1.xsd 
        		http://www.springframework.org/schema/tx 
-       		http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
+       		http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+       		http://www.springframework.org/schema/data/jpa
+       		http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
 
+	<jpa:repositories base-package="com.veisite.vegecom.service.impl.dao" />
+	
     <bean class="com.veisite.vegecom.security.SecureBasicDataSource" destroy-method="close" id="dataSource">
         <property name="driverClassName" value="${database.driverClassName}"/>
         <property name="url" value="${database.url}"/>

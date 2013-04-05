@@ -22,7 +22,7 @@ public class RestExceptionHandler extends AbstractHandlerExceptionResolver {
 	protected ModelAndView doResolveException(HttpServletRequest request,
 			HttpServletResponse response, Object handler, Exception ex) {
 		logger.debug("Resolving exception {}",ex.getMessage());
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 

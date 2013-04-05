@@ -38,36 +38,6 @@
     </bean>
     <bean id="serializationService" class="com.veisite.vegecom.service.impl.JsonSerializationService"/>
     <bean id="restExceptionResolver" class="com.veisite.vegecom.rest.error.RestExceptionHandler">
-        <property name="order" value="100"/>
-        <property name="serializationService" ref="serializationService"/>
-        <property name="errorResolver">
-            <bean class="com.veisite.vegecom.rest.error.DefaultRestErrorResolver">
-                <property name="localeResolver" ref="localeResolver"/>
-                <property name="defaultMoreInfoUrl" value="mailto:support@veisite.com"/>
-                <property name="exceptionMappingDefinitions">
-                    <map>
-                        <!-- 404 -->
-                        <entry key="com.veisite.vegecom.model.exception.ResourceNotFoundException" 
-                        		value="status=404, code=10010, msg=error.ResourceNotFoundException, 
-                        		devMsg=error.ResourceNotFoundException_dev"/>
-                        <!-- 400 -->
-                        <entry key="com.veisite.vegecom.model.exception.NewResourceWithExplicitIdException" 
-                        		value="status=400, code=10015, msg=error.ExplicitIdInvalid, 
-                        		devMsg=error.ExplicitIdInvalid_dev"/>
-                        <entry key="com.veisite.vegecom.model.exception.InvalidResourceParameterException" 
-                        		value="status=400, code=10020, msg=error.InvalidParameter, 
-                        		devMsg=error.InvalidParameter_dev"/>
-                        <!-- 409 CONFLICT -->
-                        <entry key="org.springframework.orm.jpa.JpaOptimisticLockingFailureException" 
-                        		value="status=409, code=10025, msg=error.OptimisticLockException, 
-                        		devMsg=error.OptimisticLockException_dev"/>
-
-                        <!-- 500 (catch all): -->
-                        <entry key="Throwable" value="status=500, code=500, msg=error.internal"/>
-                    </map>
-                </property>
-            </bean>
-        </property>
     </bean>
 
 </beans>

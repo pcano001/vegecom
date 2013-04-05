@@ -6,6 +6,9 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -30,7 +33,9 @@ public class Municipio extends ModelObject {
     @Column @NotNull
     private String nombre;
     
-    @ManyToOne @NotNull
+    @ManyToOne 
+    @Fetch(FetchMode.JOIN) 
+    @NotNull
     private Provincia provincia;
     
 	/**
