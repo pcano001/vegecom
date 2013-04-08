@@ -1,6 +1,6 @@
 package com.veisite.vegecom.rest;
 
-public class RestException extends Exception {
+public class RestException extends RuntimeException {
 
 	/**
 	 * serial

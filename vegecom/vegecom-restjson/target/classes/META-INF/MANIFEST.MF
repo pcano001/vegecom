@@ -1,7 +1,11 @@
 Manifest-Version: 1.0
+Built-By: josemaria
+Build-Jdk: 1.7.0_17
+Created-By: Maven Integration for Eclipse
 Bundle-ManifestVersion: 2
 Bundle-Name: vegecom json serialization service
 Bundle-SymbolicName: com.veisite.vegecom.rest.json
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Veisite Software
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+

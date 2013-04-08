@@ -37,7 +37,10 @@
         <property name="order" value="0"/>
     </bean>
     <bean id="serializationService" class="com.veisite.vegecom.service.impl.JsonSerializationService"/>
+    <bean id="errorResolver" class="com.veisite.vegecom.server.DefaultRestErrorResolver"/>
     <bean id="restExceptionResolver" class="com.veisite.vegecom.rest.error.RestExceptionHandler">
+    	<property name="serializationService" ref="serializationService"/>
+    	<property name="errorResolver" ref="errorResolver"/>
     </bean>
 
 </beans>

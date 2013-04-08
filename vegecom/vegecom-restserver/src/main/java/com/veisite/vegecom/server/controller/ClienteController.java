@@ -1,6 +1,6 @@
 package com.veisite.vegecom.server.controller;
 
-import java.io.IOException;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.stereotype.Controller;
@@ -17,14 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.veisite.utils.dataio.OutputFlowProviderRunnable;
 import com.veisite.vegecom.model.Cliente;
 import com.veisite.vegecom.rest.RestClientException;
 import com.veisite.vegecom.rest.RestException;
 import com.veisite.vegecom.rest.RestServerException;
-import com.veisite.vegecom.rest.server.ObjectFlowWriter;
 import com.veisite.vegecom.service.ClienteService;
-import com.veisite.vegecom.service.SerializationException;
 import com.veisite.vegecom.service.SerializationMappingException;
 import com.veisite.vegecom.service.SerializationParseException;
 import com.veisite.vegecom.service.SerializationService;
@@ -51,25 +47,10 @@ public class ClienteController extends DefaultController {
 	@RequestMapping(value="/list", method=RequestMethod.GET)
 	public @ResponseBody void getList(HttpServletResponse response) throws RestException {
 		logger.debug("Requesting cliente list");
-		OutputFlowProviderRunnable<Cliente> provider = new OutputFlowProviderRunnable<Cliente>() {
-			@Override
-			public void doWrite() {
-				try {
-					dataService.writeListTo(output);
-				} catch (Throwable t) {
-					error = t;
-				}
-			}
-		};
 		try {
+			List<Cliente> l = dataService.getList();
 			fillResponseHeader(response);
-			ObjectFlowWriter<Cliente> fw =
-					new ObjectFlowWriter<Cliente>(serializationService, provider, response.getOutputStream());
-			fw.doWrite();
-		} catch (SerializationException se) {
-			throw new RestServerException(se);
-		} catch (IOException ioe) {
-			throw new RestServerException(ioe);
+			serializationService.writeList(response.getOutputStream(), l);
 		} catch (Throwable t) {
 			throw new RestServerException(t);
 		}
@@ -92,10 +73,6 @@ public class ClienteController extends DefaultController {
 			}
 		} catch (RestException re) {
 			throw re;
-		} catch (SerializationException se) {
-			throw new RestServerException(se);
-		} catch (IOException ioe) {
-			throw new RestServerException(ioe);
 		} catch (Throwable t) {
 			throw new RestServerException(t);
 		}
@@ -133,12 +110,6 @@ public class ClienteController extends DefaultController {
 			// Se devuelve en la respuesta el nuevo cliente con su id.
 			fillResponseHeader(response);
 			serializationService.write(response.getOutputStream(), o);
-		} catch (DataAccessException dae) {
-			throw new RestServerException(dae);
-		} catch (SerializationException se) {
-			throw new RestServerException(se);
-		} catch (IOException ioe) {
-			throw new RestServerException(ioe);
 		} catch (Throwable t) {
 			throw new RestServerException(t);
 		}
@@ -164,7 +135,7 @@ public class ClienteController extends DefaultController {
 			throw new RestClientException(
 				new InvalidDataAccessApiUsageException("parameter Cliente is null. Cannot update"));
 		}
-		if (!o.getId().equals(id)) {
+		if (!id.equals(o.getId())) {
 			// El id del cliente a actualizar es distinto del recurso accedido
 			logger.debug("update. cliente Id mismatch resource id.");
 			throw new RestClientException(
@@ -176,12 +147,6 @@ public class ClienteController extends DefaultController {
 			// Se devuelve en la respuesta el cliente actualizado.
 			fillResponseHeader(response);
 			serializationService.write(response.getOutputStream(), o);
-		} catch (DataAccessException dae) {
-			throw new RestServerException(dae);
-		} catch (SerializationException se) {
-			throw new RestServerException(se);
-		} catch (IOException ioe) {
-			throw new RestServerException(ioe);
 		} catch (Throwable t) {
 			throw new RestServerException(t);
 		}
@@ -203,12 +168,6 @@ public class ClienteController extends DefaultController {
 			serializationService.write(response.getOutputStream(), o);
 		} catch (RestException re) {
 			throw re;
-		} catch (DataAccessException dae) {
-			throw new RestServerException(dae);
-		} catch (SerializationException se) {
-			throw new RestServerException(se);
-		} catch (IOException ioe) {
-			throw new RestServerException(ioe);
 		} catch (Throwable t) {
 			throw new RestServerException(t);
 		}
