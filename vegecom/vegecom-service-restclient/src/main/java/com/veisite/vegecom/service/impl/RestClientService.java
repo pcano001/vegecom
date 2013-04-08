@@ -1,6 +1,15 @@
 package com.veisite.vegecom.service.impl;
 
+import java.io.IOException;
+import java.util.Collections;
+
+import org.springframework.http.HttpRequest;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.support.HttpRequestWrapper;
 import org.springframework.web.client.RestTemplate;
 
 public class RestClientService {
@@ -29,7 +38,24 @@ public class RestClientService {
 	}
 
 	public RestTemplate createRestTemplate() {
-		return new RestTemplate(httpFactory);
+		RestTemplate rt = new RestTemplate(httpFactory);
+		ClientHttpRequestInterceptor requestInterceptor =
+				new CustomHeaderHttpRequestInterceptor();
+		rt.setInterceptors(Collections.singletonList(requestInterceptor));
+		return rt;
+	}
+	
+	
+	private class CustomHeaderHttpRequestInterceptor implements ClientHttpRequestInterceptor {
+		@Override
+		public ClientHttpResponse intercept(HttpRequest request, byte[] body,
+				ClientHttpRequestExecution execution) throws IOException {
+			HttpRequestWrapper requestWrapper = new HttpRequestWrapper(request);
+		    requestWrapper.getHeaders().setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));			
+		    requestWrapper.getHeaders().setContentType(MediaType.APPLICATION_JSON);			
+		    return execution.execute(requestWrapper, body);
+		}
+		
 	}
 
 }

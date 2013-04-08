@@ -30,8 +30,9 @@ public class OdsExporter {
 		
 		int columns = model.getColumnCount();
 		
-		Table sheet = outputDocument.addTable(model.getRowCount()+1, columns);
-		sheet.setTableName("Sheet 1");
+		Table sheet = outputDocument.getSheetByIndex(0);
+		sheet.appendColumns(model.getColumnCount());
+		sheet.appendRows(model.getRowCount()+1);
 		
 		// Escribir las cabeceras
 		for (int i=0;i<columns;i++) {
