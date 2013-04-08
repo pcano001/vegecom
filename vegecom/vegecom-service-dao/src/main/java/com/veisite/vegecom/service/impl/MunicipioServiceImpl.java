@@ -12,15 +12,11 @@ import com.veisite.utils.dataio.ObjectOutputFlow;
 import com.veisite.vegecom.model.Municipio;
 import com.veisite.vegecom.model.Provincia;
 import com.veisite.vegecom.service.MunicipioService;
-import com.veisite.vegecom.service.impl.dao.MunicipioDAO;
 import com.veisite.vegecom.service.impl.dao.MunicipioRepository;
 
 @Service
 @Transactional(readOnly=true)
 public class MunicipioServiceImpl implements MunicipioService {
-
-	@Autowired
-	MunicipioDAO daol;
 
 	@Autowired
 	MunicipioRepository dao;
@@ -42,10 +38,10 @@ public class MunicipioServiceImpl implements MunicipioService {
 	
 	@Override
 	public void getList(ObjectOutputFlow<Municipio> output, Provincia provincia) throws DataIOException {
-		List<Municipio> lm;
-		if (provincia==null) lm = getList();
-		else lm = getListbyProvincia(provincia);
-		for (Municipio m : lm) output.write(m);
+		List<Municipio> l;
+		if (provincia==null) l = getList();
+		else l = getListbyProvincia(provincia);
+		for (Municipio o : l) output.write(o);
 	}
 
 	@Override

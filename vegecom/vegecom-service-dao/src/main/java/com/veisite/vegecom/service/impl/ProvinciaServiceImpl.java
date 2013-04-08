@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.veisite.utils.cache.AbstractCacheableDataService;
 import com.veisite.vegecom.model.Provincia;
 import com.veisite.vegecom.service.ProvinciaService;
-import com.veisite.vegecom.service.impl.dao.ProvinciaDAO;
 import com.veisite.vegecom.service.impl.dao.ProvinciaRepository;
 
 @Service
@@ -22,9 +21,6 @@ public class ProvinciaServiceImpl extends AbstractCacheableDataService<Provincia
                                         implements ProvinciaService {
 
 	private static final Logger logger = LoggerFactory.getLogger(ProvinciaServiceImpl.class);
-	
-	@Autowired
-	ProvinciaDAO daol;
 	
 	@Autowired
 	ProvinciaRepository dao;

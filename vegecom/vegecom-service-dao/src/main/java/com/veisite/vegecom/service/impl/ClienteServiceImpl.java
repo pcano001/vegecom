@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,15 +12,17 @@ import com.veisite.utils.dataio.DataIOException;
 import com.veisite.utils.dataio.ObjectOutputFlow;
 import com.veisite.vegecom.model.Cliente;
 import com.veisite.vegecom.service.ClienteService;
-import com.veisite.vegecom.service.impl.dao.ClienteDAO;
+import com.veisite.vegecom.service.impl.dao.ClienteRepository;
 
 @Service
+@Transactional(readOnly=true)
 public class ClienteServiceImpl extends TerceroServiceImpl<Cliente> implements ClienteService {
 
 	@Autowired
-	ClienteDAO dao;
+	ClienteRepository dao;
 	
-	@Override @Transactional
+	@Override
+	@Transactional
 	public Cliente save(Cliente cliente) {
 		boolean newItem = (cliente.getId()==null);
 		Cliente i = dao.save(cliente);
@@ -28,28 +31,34 @@ public class ClienteServiceImpl extends TerceroServiceImpl<Cliente> implements C
 		return i;
 	}
 
-	@Override @Transactional
+	@Override
+	@Transactional
 	public Cliente remove(Long id) {
-		Cliente c = dao.remove(id);
+		Cliente c = getById(id);
+		dao.delete(id);
 		if (c==null)
 			throw new DataRetrievalFailureException("Cliente "+id+" not found");
 		fireItemRemovedEvent(c);
 		return c;
 	}
 
-	@Override @Transactional
+	@Override
 	public Cliente getById(Long id) {
-		return dao.getById(id);
+		return dao.findOne(id);
 	}
 
-	@Override @Transactional
+	@Override
 	public List<Cliente> getList() {
-		return dao.getList();
+		return dao.findAll(sortByNombreAsc());
 	}
 	
-	@Override @Transactional
+	@Override
 	public void writeListTo(ObjectOutputFlow<Cliente> output) throws DataIOException {
-		dao.writeListTo(output);
+		for (Cliente o : getList()) output.write(o);
 	}
 
+    private Sort sortByNombreAsc() {
+        return new Sort(Sort.Direction.ASC, "nombre");
+    }
+	
 }
