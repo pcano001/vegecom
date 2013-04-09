@@ -10,6 +10,8 @@ import javax.swing.table.TableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.veisite.utils.tasks.SimpleProgressListener;
+
 import jxl.Workbook;
 import jxl.write.DateTime;
 import jxl.write.Label;
@@ -18,11 +20,11 @@ import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 
-public class XlsExporter {
+public class XlsExporter implements TableExporter {
 	
 	private static final Logger logger = LoggerFactory.getLogger(XlsExporter.class);
 
-	public static File saveTableModelToFile(TableModel model, File file) 
+	public File saveTableModelToFile(TableModel model, File file, SimpleProgressListener listener) 
 			throws IOException {
 		
 		// Construir la hoja xls
@@ -30,6 +32,12 @@ public class XlsExporter {
 		WritableSheet sheet = workbook.createSheet("Sheet 1", 0);
 
 		int columns = model.getColumnCount();
+		
+		if (listener!=null) {
+			listener.setMaximum(model.getRowCount()+1);
+			listener.init();
+		}
+
 		// Escribir las cabeceras
 		for (int i=0;i<columns;i++) {
 			Label label = new Label(i, 0, model.getColumnName(i));
@@ -39,14 +47,17 @@ public class XlsExporter {
 				throw new IOException(we);
 			}
 		}
+		if (listener!=null) listener.setProgress(0);
 		// Escribir los datos
-		for (int c=0;c<columns;c++) 
-			for (int r=0;r<model.getRowCount();r++)
+		for (int r=0;r<model.getRowCount();r++) {
+			for (int c=0;c<columns;c++) 
 				try {
 					addCell(sheet, c,r+1,model.getValueAt(r, c));
 				} catch (WriteException we) {
 					throw new IOException(we);
 				} 
+			if (listener!=null) listener.setProgress(r+1);
+		}
 		
 		workbook.write();
 		try {
@@ -54,6 +65,9 @@ public class XlsExporter {
 		} catch (WriteException we) {
 			throw new IOException(we);
 		} 
+
+		if (listener!=null) listener.end();
+
 		return file;
 	}
 

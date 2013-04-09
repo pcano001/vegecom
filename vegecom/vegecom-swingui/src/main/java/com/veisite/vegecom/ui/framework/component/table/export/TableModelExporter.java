@@ -9,6 +9,8 @@ import javax.swing.table.TableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.veisite.utils.tasks.SimpleProgressListener;
+
 public class TableModelExporter {
 	
 	public static final Logger logger = LoggerFactory.getLogger(TableModelExporter.class);
@@ -25,13 +27,19 @@ public class TableModelExporter {
 	
 	private int format;
 	
+	/**
+	 * custom exporter
+	 */
+	private TableExporter exporter = null;
+	
 	public TableModelExporter(int format) throws IllegalArgumentException {
 		checkFormat(format);
 		if (canExport(format)) this.format = format;
 		else throw new IllegalArgumentException("Cannot export to resquesting format "+format+". No library.");
+		exporter = getExporter(format);
 	}
 
-	public File exportToTempFile(TableModel model, String prefix) throws IOException {
+	public File exportToTempFile(TableModel model, String prefix, SimpleProgressListener listener) throws IOException {
 		File out = null;
 		try {
 			out = File.createTempFile(prefix, getSuffix() );
@@ -41,16 +49,18 @@ public class TableModelExporter {
 			logger.error("Error creando fichero temporal");
 			throw ex;
 		}
-		return exportToFile(out, model);
+		return exportToFile(out, model, listener);
 	}
 	
-	public File exportToFile(File file, TableModel model) throws FileNotFoundException, IOException {
-		
-		if (format==ODS_FORMAT) 
-			return OdsExporter.saveTableModelToFile(model, file);
-		if (format==XLS_FORMAT) 
-			return XlsExporter.saveTableModelToFile(model, file);
-		return file;
+	public File exportToFile(File file, TableModel model, SimpleProgressListener listener) 
+			throws FileNotFoundException, IOException {
+		return exporter.saveTableModelToFile(model, file, listener); 
+	}
+	
+	private TableExporter getExporter(int format) {
+		if (format==ODS_FORMAT) return new OdsExporter();
+		if (format==XLS_FORMAT) return new XlsExporter();
+		return new OdsExporter();
 	}
 	
 	/**

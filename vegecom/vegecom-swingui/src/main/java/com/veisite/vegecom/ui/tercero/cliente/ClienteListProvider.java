@@ -11,6 +11,7 @@ public class ClienteListProvider extends TerceroListProvider<Cliente> {
 	 */
 	public ClienteListProvider(ClienteService dataService) {
 		super(dataService);
+		setBlockSize(25);
 	}
 	
 }

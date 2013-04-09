@@ -8,21 +8,33 @@ import java.util.GregorianCalendar;
 
 import javax.swing.table.TableModel;
 
+import org.odftoolkit.odfdom.dom.element.office.OfficeSpreadsheetElement;
 import org.odftoolkit.simple.SpreadsheetDocument;
 import org.odftoolkit.simple.table.Cell;
 import org.odftoolkit.simple.table.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Node;
 
-public class OdsExporter {
+import com.veisite.utils.tasks.SimpleProgressListener;
+
+public class OdsExporter implements TableExporter {
 	
 	private static final Logger logger = LoggerFactory.getLogger(OdsExporter.class);
-
-	public static File saveTableModelToFile(TableModel model, File file) throws IOException {
+	
+	@Override
+	public File saveTableModelToFile(TableModel model, File file, SimpleProgressListener listener) 
+			throws IOException {
 		
 		SpreadsheetDocument outputDocument;
 		try {
 			outputDocument = SpreadsheetDocument.newSpreadsheetDocument();
+			OfficeSpreadsheetElement officeSpreadsheet = outputDocument.getContentRoot();
+			Node childNode = officeSpreadsheet.getFirstChild();
+			while (childNode != null) {
+			        officeSpreadsheet.removeChild(childNode);
+			        childNode = officeSpreadsheet.getFirstChild();
+			}
 		} catch (Exception e) {
 			logger.error("Cannot create new ods spreadsheet.",e);
 			throw new IOException(e);
@@ -30,8 +42,13 @@ public class OdsExporter {
 		
 		int columns = model.getColumnCount();
 		
-		Table sheet = outputDocument.getSheetByIndex(0);
-		sheet.appendColumns(model.getColumnCount());
+		if (listener!=null) {
+			listener.setMaximum(model.getRowCount()+1);
+			listener.init();
+		}
+
+		Table sheet = outputDocument.addTable();
+		sheet.appendColumns(columns);
 		sheet.appendRows(model.getRowCount()+1);
 		
 		// Escribir las cabeceras
@@ -39,16 +56,21 @@ public class OdsExporter {
 			Cell cell = sheet.getCellByPosition(i, 0);
 			cell.setStringValue(model.getColumnName(i));
 		}
+		if (listener!=null) listener.setProgress(0);
 		// Escribir los datos
-		for (int c=0;c<columns;c++) 
-			for (int r=0;r<model.getRowCount();r++)
-				addCell(sheet, c,r+1,model.getValueAt(r, c));
+		for (int r=0;r<model.getRowCount();r++) {
+			for (int c=0;c<columns;c++) addCell(sheet, c,r+1,model.getValueAt(r, c));
+			if (listener!=null) listener.setProgress(r+1);
+		}
 		
 		try {
 			outputDocument.save(file);
 		} catch (Exception e) {
 			throw new IOException(e);
 		}
+		
+		if (listener!=null) listener.end();
+		
 		return file;
 	}
 

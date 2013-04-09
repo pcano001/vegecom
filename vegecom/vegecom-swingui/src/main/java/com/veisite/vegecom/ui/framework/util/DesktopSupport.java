@@ -2,6 +2,7 @@ package com.veisite.vegecom.ui.framework.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class DesktopSupport {
 	
@@ -30,27 +31,30 @@ public class DesktopSupport {
 			java.awt.Desktop.getDesktop().open(file);
 		} catch (UnsupportedOperationException e) {
 			// No se soporta la operación de apertura.
-			// Si es linux se intenta con evince
-			tryOpenFileOnLinux(file);
+			tryOpenFileNative(file);
 		}
 	}
 	
-	private static void tryOpenFileOnLinux(File file) throws IOException {
-		String os = System.getProperty("os.name").toUpperCase();
-		if (os.contains("LINUX")) {
-			String command = file.getAbsolutePath();
-			// Try on gnome
-			try {
-				Runtime.getRuntime().exec("gnome-open "+command);
-				return;
-			} catch (Throwable t) {}
-			// Try on kde
-			try {
-				Runtime.getRuntime().exec("kmfclient "+command);
-				return;
-			} catch (Throwable t) {}
-		}
-		throw new IOException("Cannot show file. OS not supported.");
+	private static void tryOpenFileNative(File file) throws IOException {
+		final String os = System.getProperty("os.name").toUpperCase();
+        final String[] cmdarray;
+        if (os.contains("WINDOWS")) {
+            cmdarray = new String[] { "cmd", "/c", "start", "\"\"", file.getCanonicalPath() };
+        } else if (os.contains("MAC OS")) {
+            cmdarray = new String[] { "open", file.getCanonicalPath() };
+        } else if (os.contains("LINUX")) {
+            cmdarray = new String[] { "xdg-open", file.getCanonicalPath() };
+        } else {
+            throw new IOException("unknown way to open " + file);
+        }
+        try {
+            // can wait since the command return as soon as the native application is launched
+            final int res = Runtime.getRuntime().exec(cmdarray).waitFor();
+            if (res != 0)
+                throw new IOException("error (" + res + ") executing " + Arrays.asList(cmdarray));
+        } catch (InterruptedException e) {
+            throw new IOException("interrupted waiting for " + Arrays.asList(cmdarray));
+        }
 	}
 
 }

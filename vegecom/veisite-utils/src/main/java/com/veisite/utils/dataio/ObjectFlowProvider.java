@@ -74,8 +74,9 @@ public abstract class ObjectFlowProvider<T> {
 			try {
 				lista = getNextBlock(blockSize);
 				fireObjectFlowBlock(lista);
-			} catch (Throwable t) {
-				fireObjectFlowError(t);
+			} catch (DataIOException dioe) {
+				if (dioe.getCause()!=null) fireObjectFlowError(dioe.getCause());
+				else fireObjectFlowError(dioe);
 				return;
 			}
 		} while (lista!=null && lista.size()>=blockSize);

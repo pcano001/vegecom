@@ -6,10 +6,10 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.text.DecimalFormat;
 import java.util.Locale;
 
@@ -30,8 +30,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 
+import com.veisite.utils.tasks.ProgressableTaskDialog;
 import com.veisite.vegecom.model.exception.VegecomException;
 import com.veisite.vegecom.ui.framework.component.panels.DefaultTableStatusBar;
+import com.veisite.vegecom.ui.framework.component.table.export.ExportTableModelTask;
 import com.veisite.vegecom.ui.framework.component.table.export.TableModelExporter;
 import com.veisite.vegecom.ui.framework.util.DesktopSupport;
 
@@ -106,6 +108,19 @@ public abstract class AbstractListTablePanel<T> extends JPanel {
 	 * clave de texto para el error al exportar los datos
 	 */
 	public static final String EXPORTERROR_MESSAGE_KEY="ui.components.ListTablePanel.ExportErrorText";
+	/**
+	 * clave de texto para el la tarea de exportacion de datos
+	 */
+	public static final String EXPORTTASK_MESSAGE_KEY="ui.components.ListTablePanel.ExportTaskText";
+	/**
+	 * clave de texto para el error en la carga de datos
+	 */
+	public static final String ERRORLOAD_MESSAGE_KEY="ui.components.ListTablePanel.LoadErrorText";
+	
+	/**
+	 * listsner para la carga de datos
+	 */
+	private DataLoadListener dataLoadListener = null;
 	
 	/*
 	 * Variables de mensajes de texto
@@ -117,6 +132,8 @@ public abstract class AbstractListTablePanel<T> extends JPanel {
 	private String exportOdsTextMenu = "ODS format";
 	private String exportXlsTextMenu = "XLS format";
 	private String exportErrorText = "Error exporting data";
+	private String exportTaskText = "Exporting data...";
+	private String loadErrorText = "Error loading data...";
 	
 	
 	public AbstractListTablePanel(Component parent, AbstractListJTable<T> table, 
@@ -157,9 +174,12 @@ public abstract class AbstractListTablePanel<T> extends JPanel {
 				messageSource.getMessage(EXPORTXLS_MENU_KEY,null,exportXlsTextMenu,Locale.getDefault());
 			exportErrorText = 
 				messageSource.getMessage(EXPORTERROR_MESSAGE_KEY,null,exportErrorText,Locale.getDefault());
+			exportTaskText = 
+					messageSource.getMessage(EXPORTERROR_MESSAGE_KEY,null,exportTaskText,Locale.getDefault());
+			loadErrorText = 
+					messageSource.getMessage(ERRORLOAD_MESSAGE_KEY,null,loadErrorText,Locale.getDefault());
 		}
-		
-		table.getModel().addDataLoadListener(new DataLoadListener() {
+		dataLoadListener = new DataLoadListener() {
 			@Override
 			public void dataLoadInit() {
 				statusBar.startProgress();
@@ -180,8 +200,10 @@ public abstract class AbstractListTablePanel<T> extends JPanel {
 				statusBar.stopProgress();
 				statusBar.setProgressText(errorText);
 				updateStatusBar();
+				showDataLoadError(exception);
 			}
-		});
+		};
+		table.getModel().addDataLoadListener(dataLoadListener);
 		table.getModel().addTableModelListener(new TableModelListener() {
 			@Override
 			public void tableChanged(TableModelEvent arg0) {
@@ -361,8 +383,15 @@ public abstract class AbstractListTablePanel<T> extends JPanel {
 		try {
 			TableModelExporter te = new TableModelExporter(format);
 			TableViewModelWraper model = new TableViewModelWraper(table);
-			File f = te.exportToTempFile(model, "tmpexport");
-			DesktopSupport.openFile(f);
+
+	        ExportTableModelTask task = new ExportTableModelTask(model, te, exportTaskText);
+	        Window parent = SwingUtilities.getWindowAncestor(this);
+			boolean ret = ProgressableTaskDialog.showTaskRunning(parent, exportTaskText, task);
+			// Si la tarea sigue ejecutando es que se ha cancelado, salir.
+			if (!ret) return;
+			if (task.isCanceled()) return;
+			if (task.isError()) throw task.getException();
+			DesktopSupport.openFile(task.getFile());
 		} catch (Throwable t) {
 			logger.error("Error exporting data.",t);
 			ErrorInfo info = new ErrorInfo(exportErrorText, t.getMessage(), 
@@ -371,6 +400,12 @@ public abstract class AbstractListTablePanel<T> extends JPanel {
 		} finally {
 			table.setCursor(c);
 		}
+	}
+	
+	private void showDataLoadError(Throwable exception) {
+		Throwable cause = exception.getCause()==null? exception : exception.getCause();
+		ErrorInfo err = new ErrorInfo("Error", loadErrorText, exception.getMessage(), null, cause, null, null);
+		JXErrorPane.showDialog(this, err);
 	}
 
 }
