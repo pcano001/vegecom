@@ -9,6 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResponseExtractor;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.veisite.utils.dataio.DataIOException;
@@ -32,6 +33,9 @@ public class ClienteDAO {
 	@Autowired
 	private SerializationService serializationService;
 	
+	@Autowired
+	private DAOExceptionHandler exceptionHandler;
+	
 	private static final String ENTRYPOINT_URL = "/cliente";
 	
 	public Cliente getById(Long id) {
@@ -40,7 +44,11 @@ public class ClienteDAO {
 		RequestCallback cb = null;
 		ResponseExtractor<Cliente> ex = 
 				new ObjectResponseExtractor<Cliente>(serializationService, Cliente.class);
-		return tp.execute(url, HttpMethod.GET, cb, ex, id);
+		try {
+			return tp.execute(url, HttpMethod.GET, cb, ex, id);
+		} catch (RestClientException rce) {
+			throw exceptionHandler.getDataAccessException(rce);
+		}
 	}
 	
 	public Cliente save(Cliente cliente) {
@@ -59,7 +67,11 @@ public class ClienteDAO {
 			new ObjectRequestFiller<Cliente>(serializationService, cliente);
 		ResponseExtractor<Cliente> ex = 
 				new ObjectResponseExtractor<Cliente>(serializationService, Cliente.class);
-		return tp.execute(url, HttpMethod.POST, cb, ex);
+		try {
+			return tp.execute(url, HttpMethod.POST, cb, ex);
+		} catch (RestClientException rce) {
+			throw exceptionHandler.getDataAccessException(rce);
+		}
 	}
 
 	public Cliente update(Cliente cliente) {
@@ -69,7 +81,11 @@ public class ClienteDAO {
 			new ObjectRequestFiller<Cliente>(serializationService, cliente);
 		ResponseExtractor<Cliente> ex = 
 			new ObjectResponseExtractor<Cliente>(serializationService, Cliente.class);
-		return tp.execute(url, HttpMethod.PUT, cb, ex, cliente.getId());
+		try {
+			return tp.execute(url, HttpMethod.PUT, cb, ex, cliente.getId());
+		} catch (RestClientException rce) {
+			throw exceptionHandler.getDataAccessException(rce);
+		}
 	}
 
 	public Cliente remove(Long id) {
@@ -78,7 +94,11 @@ public class ClienteDAO {
 		RequestCallback cb = null;
 		ResponseExtractor<Cliente> ex = 
 			new ObjectResponseExtractor<Cliente>(serializationService, Cliente.class);
-		return tp.execute(url, HttpMethod.DELETE, cb, ex, id);
+		try {
+			return tp.execute(url, HttpMethod.DELETE, cb, ex, id);
+		} catch (RestClientException rce) {
+			throw exceptionHandler.getDataAccessException(rce);
+		}
 	}
 	
 	/**
@@ -92,7 +112,11 @@ public class ClienteDAO {
 		RequestCallback cb = null;
 		ResponseExtractor<List<Cliente>> ex = 
 				new ListResponseExtractor<Cliente>(serializationService, Cliente.class);
-		return tp.execute(url, HttpMethod.GET, cb, ex);
+		try {
+			return tp.execute(url, HttpMethod.GET, cb, ex);
+		} catch (RestClientException rce) {
+			throw exceptionHandler.getDataAccessException(rce);
+		}
 	}
 
 	
@@ -108,9 +132,12 @@ public class ClienteDAO {
 		ResponseExtractor<Cliente> ex = 
 				new ObjectFlowResponseExtractor<Cliente>(serializationService, output, Cliente.class);
 		logger.debug("Quering server for Cliente List...");
-		tp.execute(url, HttpMethod.GET, cb, ex);
+		try {
+			tp.execute(url, HttpMethod.GET, cb, ex);
+		} catch (RestClientException rce) {
+			throw exceptionHandler.getDataAccessException(rce);
+		}
 		logger.debug("Reading cliente has ended correctly, exiting...");
 	}
 
-	
 }

@@ -8,6 +8,7 @@ import java.util.GregorianCalendar;
 
 import javax.swing.table.TableModel;
 
+import org.jopendocument.dom.spreadsheet.SpreadSheet;
 import org.odftoolkit.odfdom.dom.element.office.OfficeSpreadsheetElement;
 import org.odftoolkit.simple.SpreadsheetDocument;
 import org.odftoolkit.simple.table.Cell;
@@ -25,7 +26,26 @@ public class OdsExporter implements TableExporter {
 	@Override
 	public File saveTableModelToFile(TableModel model, File file, SimpleProgressListener listener) 
 			throws IOException {
+
+		try {
+			Class.forName("org.jopendocument.dom.spreadsheet.SpreadSheet", 
+		    		  false, TableModelExporter.class.getClassLoader());
+		    return trySaveWithjOpenDocument(model, file, listener);
+		} catch(ClassNotFoundException e) {}
+		return trySaveWithOdftoolkit(model, file, listener);
+	}
 		
+	private File trySaveWithjOpenDocument(TableModel model, File file, SimpleProgressListener listener) 
+			throws IOException {
+		listener.setMaximum(-1);
+		listener.init();
+		SpreadSheet.createEmpty(model).saveAs(file);
+		listener.end();
+		return file;
+	}
+	
+	private File trySaveWithOdftoolkit(TableModel model, File file, SimpleProgressListener listener) 
+				throws IOException {
 		SpreadsheetDocument outputDocument;
 		try {
 			outputDocument = SpreadsheetDocument.newSpreadsheetDocument();

@@ -24,7 +24,7 @@ public class RestExceptionHandler extends AbstractHandlerExceptionResolver {
 	protected ModelAndView doResolveException(HttpServletRequest request,
 			HttpServletResponse response, Object handler, Exception ex) {
 		logger.debug("Resolving exception {}",ex.getMessage());
-		RestError err = errorResolver.resolve(ex);
+		RestError err = errorResolver.resolve(ex,request.getLocale());
 		response.setStatus(err.getStatus().value());
 		response.setContentType("application/json");
 		try {

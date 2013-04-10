@@ -50,9 +50,7 @@ public class ClienteController extends DefaultController {
 		try {
 			List<Cliente> l = dataService.getList();
 			fillResponseHeader(response);
-			for (int i=0;i<1000;i++) {
-				serializationService.writeList(response.getOutputStream(), l);
-			}
+			serializationService.writeList(response.getOutputStream(), l);
 		} catch (Throwable t) {
 			throw new RestServerException(t);
 		}

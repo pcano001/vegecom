@@ -13,6 +13,18 @@
        		http://www.springframework.org/schema/tx 
        		http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
 
+	<bean id="daoMessageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename">
+			<value>i18n.messagesRestClientDAO</value>
+		</property>
+	</bean>
+	
+	<bean id="daoExceptionHandler"
+		class="com.veisite.vegecom.service.impl.dao.DAOExceptionHandler">
+		<property name="messageSource" ref="daoMessageSource"/>
+	</bean>
+
 	<bean id="restService" class="com.veisite.vegecom.service.impl.RestClientService">
 		<property name="baseURL">
 			<value>${server.rest.baseURL}</value>

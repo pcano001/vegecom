@@ -128,7 +128,25 @@ public class JsonSerializationService implements SerializationService {
 		try {
 			T o = null;
 			JsonParser jpar = factory.createJsonParser(input);
-			if (jpar.nextToken()!=null) o = mapper.readValue(jpar, type); 
+			if (jpar.nextToken()!=null) o = mapper.readValue(jpar, type);
+			return o;
+		} catch (JsonParseException pe) {
+			logger.debug("Error read", pe);
+			throw new SerializationParseException(pe);
+		} catch (JsonMappingException me) {
+			logger.debug("Error read", me);
+			throw new SerializationMappingException(me);
+		} catch (IOException ioe) {
+			logger.debug("Error read", ioe);
+			throw new SerializationException(ioe);
+		}
+	}
+
+	public <T> T read(String content, Class<T> type) throws SerializationException {
+		try {
+			T o = null;
+			JsonParser jpar = factory.createJsonParser(content);
+			if (jpar.nextToken()!=null) o = mapper.readValue(content, type);
 			return o;
 		} catch (JsonParseException pe) {
 			logger.debug("Error read", pe);

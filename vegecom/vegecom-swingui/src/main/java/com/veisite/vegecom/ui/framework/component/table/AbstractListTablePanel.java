@@ -112,10 +112,6 @@ public abstract class AbstractListTablePanel<T> extends JPanel {
 	 * clave de texto para el la tarea de exportacion de datos
 	 */
 	public static final String EXPORTTASK_MESSAGE_KEY="ui.components.ListTablePanel.ExportTaskText";
-	/**
-	 * clave de texto para el error en la carga de datos
-	 */
-	public static final String ERRORLOAD_MESSAGE_KEY="ui.components.ListTablePanel.LoadErrorText";
 	
 	/**
 	 * listsner para la carga de datos
@@ -133,7 +129,6 @@ public abstract class AbstractListTablePanel<T> extends JPanel {
 	private String exportXlsTextMenu = "XLS format";
 	private String exportErrorText = "Error exporting data";
 	private String exportTaskText = "Exporting data...";
-	private String loadErrorText = "Error loading data...";
 	
 	
 	public AbstractListTablePanel(Component parent, AbstractListJTable<T> table, 
@@ -176,8 +171,6 @@ public abstract class AbstractListTablePanel<T> extends JPanel {
 				messageSource.getMessage(EXPORTERROR_MESSAGE_KEY,null,exportErrorText,Locale.getDefault());
 			exportTaskText = 
 					messageSource.getMessage(EXPORTERROR_MESSAGE_KEY,null,exportTaskText,Locale.getDefault());
-			loadErrorText = 
-					messageSource.getMessage(ERRORLOAD_MESSAGE_KEY,null,loadErrorText,Locale.getDefault());
 		}
 		dataLoadListener = new DataLoadListener() {
 			@Override
@@ -402,10 +395,6 @@ public abstract class AbstractListTablePanel<T> extends JPanel {
 		}
 	}
 	
-	private void showDataLoadError(Throwable exception) {
-		Throwable cause = exception.getCause()==null? exception : exception.getCause();
-		ErrorInfo err = new ErrorInfo("Error", loadErrorText, exception.getMessage(), null, cause, null, null);
-		JXErrorPane.showDialog(this, err);
-	}
-
+	protected abstract void showDataLoadError(Throwable exception);
+	
 }

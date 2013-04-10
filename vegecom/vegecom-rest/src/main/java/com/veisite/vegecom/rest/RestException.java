@@ -1,6 +1,13 @@
 package com.veisite.vegecom.rest;
 
-public class RestException extends RuntimeException {
+/**
+ * Superclass form exception ocurred in a rest framework.
+ * must be overriden 
+ * 
+ * @author josemaria
+ *
+ */
+public abstract class RestException extends RuntimeException {
 
 	/**
 	 * serial

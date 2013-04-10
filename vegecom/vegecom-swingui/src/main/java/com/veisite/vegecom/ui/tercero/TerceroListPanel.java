@@ -13,10 +13,13 @@ import javax.swing.JPopupMenu;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.SortOrder;
 
+import org.jdesktop.swingx.JXErrorPane;
+import org.jdesktop.swingx.error.ErrorInfo;
 import org.springframework.util.Assert;
 
 import com.veisite.vegecom.model.TerceroComercial;
 import com.veisite.vegecom.model.exception.VegecomException;
+import com.veisite.vegecom.ui.error.ErrorUtil;
 import com.veisite.vegecom.ui.framework.component.table.AbstractListJTable;
 import com.veisite.vegecom.ui.framework.component.table.AbstractListTablePanel;
 import com.veisite.vegecom.ui.framework.views.UIFrameworkView;
@@ -79,6 +82,10 @@ public abstract class TerceroListPanel<T extends TerceroComercial> extends UIFra
 			protected void enableDisablePopupMenu() {
 				super.enableDisablePopupMenu();
 				enablePopupMenu();
+			}
+			@Override
+			protected void showDataLoadError(Throwable exception) {
+				dataLoadError(exception);
 			}
 		};
 		configurePopupMenu();
@@ -263,5 +270,13 @@ public abstract class TerceroListPanel<T extends TerceroComercial> extends UIFra
 		}
 	}
 
-	
+	private void dataLoadError(Throwable exception ) {
+		String loadErrorText = "Error loading data...";
+		loadErrorText = 
+				uiService.getMessage("ui.components.ListTablePanel.LoadErrorTitleText",null,"Error loading data...");
+		ErrorInfo err = ErrorUtil.getErrorInfo(exception,loadErrorText);
+		JXErrorPane.showDialog(this, err);
+	}
+
+
 }

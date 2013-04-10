@@ -105,6 +105,14 @@ public class TableModelExporter {
 		   } catch(ClassNotFoundException e) {
 			   canOdf = false;
 		   }
+		try {
+		      Class.forName("org.jopendocument.dom.spreadsheet.SpreadSheet", 
+		    		  false, TableModelExporter.class.getClassLoader());
+		      canOdf = true;
+		   } catch(ClassNotFoundException e) {
+			   canOdf = false;
+		   }
+		
 	}
 	
 }

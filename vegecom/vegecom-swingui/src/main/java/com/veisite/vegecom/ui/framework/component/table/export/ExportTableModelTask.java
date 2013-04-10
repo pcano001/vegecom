@@ -40,7 +40,14 @@ public class ExportTableModelTask extends ProgressableTask {
 		}
 		@Override
 		public void setMaximum(int maximun) {
-			if (maximun != 0) this.max=maximun;
+			if (maximun > 0) {
+				setIndeterminateProgress(false);
+				this.max=maximun;
+			}
+			if (maximun < 0) {
+				setIndeterminateProgress(true);
+				this.max=maximun;
+			}
 		}
 		@Override
 		public void end() {

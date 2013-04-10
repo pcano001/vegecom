@@ -88,6 +88,11 @@
     	<artifactId>simple-odf</artifactId>
     	<version>0.6.6</version>
     </dependency>
+    <dependency>
+    	<groupId>org.jopendocument</groupId>
+    	<artifactId>jOpenDocument</artifactId>
+    	<version>1.3b1</version>
+    </dependency>
   </dependencies>
   
 </project>
