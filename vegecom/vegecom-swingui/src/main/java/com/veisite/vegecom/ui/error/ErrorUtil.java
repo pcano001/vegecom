@@ -11,14 +11,17 @@ public class ErrorUtil {
 	 * para mostrar información del error en un interfaz gráfico.
 	 * 
 	 */
-	public static ErrorInfo getErrorInfo(Throwable exception, String title) {
+	public static ErrorInfo getErrorInfo(Throwable exception, String title, String message) {
 		if (exception instanceof NestedRuntimeException ||
 				exception instanceof NestedCheckedException) 
-			return getErrorInfoNested((NestedRuntimeException) exception, title);
+			return getErrorInfoNested((NestedRuntimeException) exception, title, message);
+		String m;
+		if (message!=null && !message.isEmpty()) m = message;
+		else m = exception.getLocalizedMessage();
 		String dm = getDetailedMessage(exception);
 		ErrorInfo err = 
 			new ErrorInfo(title==null? "Error" : title, 
-						exception.getLocalizedMessage(), 
+						m, 
 						dm, 
 						null, 
 						exception, 
@@ -31,15 +34,25 @@ public class ErrorUtil {
 	 * Metodo que recibe una exception encadenada y devuelve el objeto de error
 	 * El mensaje es unicamente el mensaje de error de la primera exception.
 	 */
-	private static ErrorInfo getErrorInfoNested(Throwable exception, String title) {
-		String dm=getDetailedMessage(exception.getCause());
-		String m = getFirstNestedMessage(exception);
+	private static ErrorInfo getErrorInfoNested(Throwable exception, String title, String message) {
+		String m = "", dm;
+		Throwable cause;
+		if (message!=null && !message.isEmpty()) {
+			m = message;
+			dm=getDetailedMessage(exception);
+			cause = exception.getCause();
+		} else {
+			m = getFirstNestedMessage(exception);
+			dm=getDetailedMessage(exception.getCause());
+			cause = exception.getCause();
+			if (cause!=null) cause = cause.getCause();
+		}
 		ErrorInfo err = 
 				new ErrorInfo(title==null? "Error" : title, 
 							m, 
 							dm, 
 							null, 
-							exception, 
+							cause, 
 							null, 
 							null);
 		return err;

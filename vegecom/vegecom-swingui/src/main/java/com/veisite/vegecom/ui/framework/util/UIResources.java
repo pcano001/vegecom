@@ -84,12 +84,16 @@ public class UIResources {
 	private static ImageIcon getIcon(String name, String size) {
 		String path = iconsPath + name + size + ".png";
 		URL url = path.getClass().getResource(path);
+		logger.debug("Trying path {} and url {}.",path,url);
 		if (url != null) return new ImageIcon(url);
 		url = path.getClass().getResource("/"+path);
+		logger.debug("Trying path {} and url {}.","/"+path,url);
 		if (url != null) return new ImageIcon(url);
 		ClassLoader loader = UIResources.class.getClassLoader();
+		logger.debug("UIResources ClassLoader. Trying path {} and url {}.",path,url);
 		if(loader != null) url = loader.getResource(path);
 		if(url == null) url = loader.getResource("/"+path);
+		logger.debug("UIResources ClassLoader. Trying path {} and url {}.","/"+path,url);
 		if(url != null) return new ImageIcon(url);
 		logger.error("El icono solicitado no se encuentra: {}",path);
 		return null;

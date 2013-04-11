@@ -5,7 +5,6 @@ import java.io.File;
 import javax.swing.table.TableModel;
 
 import com.veisite.utils.tasks.ProgressableTask;
-import com.veisite.utils.tasks.SimpleProgressListener;
 
 public class ExportTableModelTask extends ProgressableTask {
 	
@@ -27,46 +26,18 @@ public class ExportTableModelTask extends ProgressableTask {
 	 */
 	private String message;
 	
-	
-	private SimpleProgressListener listener = new SimpleProgressListener() {
-		private int max = 100;
-		@Override
-		public void init() {
-			notifyProgress(0, null);
-		}
-		@Override
-		public void setProgress(int progress) {
-			notifyProgress((progress*100)/max, null);
-		}
-		@Override
-		public void setMaximum(int maximun) {
-			if (maximun > 0) {
-				setIndeterminateProgress(false);
-				this.max=maximun;
-			}
-			if (maximun < 0) {
-				setIndeterminateProgress(true);
-				this.max=maximun;
-			}
-		}
-		@Override
-		public void end() {
-			notifyProgress(100, null);
-		}
-	};
-	
-
 	public ExportTableModelTask(TableModel model, TableModelExporter exporter, String message) {
 		this.model = model;
 		this.exporter = exporter;
 		this.message = message;
+		if (exporter.getFormat()==TableModelExporter.XLS_FORMAT) setCancelable(true);
 	}
 	
 	@Override
 	public void doInBackground() throws Throwable {
 		setIndeterminateProgress(false);
 		if (message!=null) setJobDoing(message);
-		this.file = exporter.exportToTempFile(model, "tmpexport",listener);
+		this.file = exporter.exportToTempFile(model, "tmpexport",getListener());
 		return;
 	}
 
@@ -75,6 +46,11 @@ public class ExportTableModelTask extends ProgressableTask {
 	 */
 	public File getFile() {
 		return file;
+	}
+
+	@Override
+	public boolean cancelResquestedAreYouOk() {
+		return true;
 	}
 
 }

@@ -9,12 +9,16 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
-import java.util.ResourceBundle;
+import java.util.Locale;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+
+import org.springframework.context.MessageSource;
+
+import com.veisite.vegecom.ui.framework.UIFramework;
 
 /**
  * Dialog simple que muestra un boton de cerrar en la parte baja
@@ -29,38 +33,32 @@ public class SimpleViewDialog extends JDialog {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * Clave en recurso de mensajes para texto boton close
-	 */
-	public static final String CLOSE_BUTTON_MESSAGE_KEY = 
-			"ui.components.dialogs.CloseButtonText";
-	
 	private JPanel contentPanel;
 	private JButton closeButton;
 	
 	/**
 	 * recurso de mensjaes i18n
 	 */
-	ResourceBundle resourceBundle;
+	MessageSource messageSource;
 
-	public SimpleViewDialog(Dialog owner, String title, JPanel contentPanel, ResourceBundle resourceBundle) {
+	public SimpleViewDialog(Dialog owner, String title, JPanel contentPanel, MessageSource messageSource) {
 		super(owner, title);
 		this.contentPanel = contentPanel;
-		this.resourceBundle = resourceBundle;
+		this.messageSource = messageSource;
 		initDialog();
 	}
 
-	public SimpleViewDialog(Frame owner, String title, JPanel contentPanel, ResourceBundle resourceBundle) {
+	public SimpleViewDialog(Frame owner, String title, JPanel contentPanel, MessageSource messageSource) {
 		super(owner, title);
 		this.contentPanel = contentPanel;
-		this.resourceBundle = resourceBundle;
+		this.messageSource = messageSource;
 		initDialog();
 	}
 	
-	public SimpleViewDialog(Window owner, String title, JPanel contentPanel, ResourceBundle resourceBundle) {
+	public SimpleViewDialog(Window owner, String title, JPanel contentPanel, MessageSource messageSource) {
 		super(owner, title);
 		this.contentPanel = contentPanel;
-		this.resourceBundle = resourceBundle;
+		this.messageSource = messageSource;
 		initDialog();
 	}
 	
@@ -73,10 +71,7 @@ public class SimpleViewDialog extends JDialog {
 			}
 		};
 		
-		String s  = "Close";
-		if (resourceBundle!=null && resourceBundle.containsKey(CLOSE_BUTTON_MESSAGE_KEY)) {
-			s = resourceBundle.getString(CLOSE_BUTTON_MESSAGE_KEY);
-		}
+		String s  = messageSource.getMessage(UIFramework.CLOSEBUTTONTEXT_MSGKEY, null, "Close", Locale.getDefault()); 
 		closeButton = new JButton(s);
 		closeButton.addActionListener(bl);
 		

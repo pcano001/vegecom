@@ -73,7 +73,8 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 		if (err.getMessage()==null) {
 			String m = getMessage(RestErrorCode.UNKNOW.getMessageKey(),null,"Unexpected error", locale);
 			err.setMessage(m);
-			err.setDetailedMessages(new String[] {m});
+			err.setDetailedMessages(new String[] {});
+			err.setDebugMessages(getDebugMessage(ex));
 		}
 		return err;
 	}
@@ -129,7 +130,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 			String m = getMessage(RestErrorCode.RESOURCE_NOT_FOUND.getMessageKey(), null, 
 					"Resource not found", locale);
 			err.setMessage(m);
-			err.setDetailedMessages(new String[] {m,ex.getMessage()});
+			err.setDetailedMessages(new String[] {ex.getMessage()});
 			return;
 		}
 		if (ex instanceof InvalidDataAccessApiUsageException) {
@@ -138,7 +139,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 			String m = getMessage(RestErrorCode.INVALID_ARGUMENT.getMessageKey(), null, 
 					"Illegal arguments on request",locale);
 			err.setMessage(m);
-			err.setDetailedMessages(new String[] {m,ex.getMessage()});
+			err.setDetailedMessages(new String[] {ex.getMessage()});
 			return;
 		}
 		if (ex instanceof ConcurrencyFailureException) {
@@ -148,7 +149,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 					"Update Conflict. It seems that data has been updated or deleted by another session",
 					locale);
 			err.setMessage(m);
-			err.setDetailedMessages(new String[] {m,ex.getMessage()});
+			err.setDetailedMessages(new String[] {ex.getMessage()});
 			return;
 		}
 		if (ex instanceof DataIntegrityViolationException) {
@@ -157,7 +158,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 			String m = getMessage(RestErrorCode.DATAINTEGRITY_VIOLATION.getMessageKey(), null, 
 					"Data integrity violation",locale);
 			err.setMessage(m);
-			err.setDetailedMessages(new String[] {m,ex.getMessage()});
+			err.setDetailedMessages(new String[] {ex.getMessage()});
 			return;
 		}
 		if (ex instanceof DataAccessResourceFailureException) {
@@ -166,7 +167,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 			String m = getMessage(RestErrorCode.DATASOURCE_FAILED.getMessageKey(), null, 
 					"Error connecting to database",locale);
 			err.setMessage(m);
-			err.setDetailedMessages(new String[] {m,ex.getMessage()});
+			err.setDetailedMessages(new String[] {ex.getMessage()});
 			return;
 		}
 		err.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -174,7 +175,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 		String m = getMessage(RestErrorCode.DATAACCESS_FAILED.getMessageKey(), null, 
 				"Error data access exception",locale);
 		err.setMessage(m);
-		err.setDetailedMessages(new String[] {m,ex.getMessage()});
+		err.setDetailedMessages(new String[] {ex.getMessage()});
 		return;
 	}
 	
@@ -186,7 +187,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 			String m = getMessage(RestErrorCode.INVALID_ARGUMENT.getMessageKey(), null, 
 					"Illegal arguments on request",locale);
 			err.setMessage(m);
-			err.setDetailedMessages(new String[] {m,ex.getMessage()});
+			err.setDetailedMessages(new String[] {ex.getMessage()});
 			return;
 		}
 		err.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -194,7 +195,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 		String m = getMessage(RestErrorCode.GENERIC_IOEXCEPTION.getMessageKey(), null, 
 				"Server error in response generation.",locale);
 		err.setMessage(m);
-		err.setDetailedMessages(new String[] {m,ex.getMessage()});
+		err.setDetailedMessages(new String[] {ex.getMessage()});
 	}
 	
 	private void resolveTransactionException(TransactionException ex, RestError err, Locale locale) {
@@ -221,7 +222,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 		}
 		err.setExceptionClass(ex1.getClass().getSimpleName());
 		err.setMessage(m);
-		err.setDetailedMessages(new String[] {m,ex1.getMessage()});
+		err.setDetailedMessages(new String[] {ex1.getMessage()});
 		err.setDebugMessages(getDebugMessage(ex1));
 	}
 	

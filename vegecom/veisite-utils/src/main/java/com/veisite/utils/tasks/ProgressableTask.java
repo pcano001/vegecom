@@ -8,7 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Tarea que se ejecuta y reporta su progreso a un ProgreeReporte
+ * Tarea que se ejecuta y reporta su progreso a un ProgressReporter
+ * 
  * @author josemaria
  *
  */
@@ -53,14 +54,56 @@ public abstract class ProgressableTask {
 	private boolean indeterminateProgress=true;
 
 	/**
+	 * Señala si la tarea se puede o no cancelar.
+	 * Por defecto una tarea no puede cancelarse
+	 */
+	private boolean cancelable=false;
+
+	/**
 	 * Lista de listener que escuchan el progreso de la tarea.
 	 */
 	private List<ProgressEventListener> _listeners = new ArrayList<ProgressEventListener>();
 
 	/**
+	 * Integración de la tarea con un SimpleProgressListener como ayuda 
+	 * para ejecución de tareas secundarias.
+	 */
+	private SimpleProgressListener listener = new SimpleProgressListener() {
+		private int max = 100;
+		@Override
+		public void init() {
+			notifyProgress(0, null);
+		}
+		@Override
+		public void setProgress(int progress) {
+			notifyProgress((progress*100)/max, null);
+		}
+		@Override
+		public void setMaximum(int maximun) {
+			if (maximun > 0) {
+				setIndeterminateProgress(false);
+				this.max=maximun;
+			}
+			if (maximun < 0) {
+				setIndeterminateProgress(true);
+				this.max=maximun;
+			}
+		}
+		@Override
+		public void end() {
+			notifyProgress(100, null);
+		}
+		@Override
+		public boolean canceled() {
+			return (state==TASK_CANCELED); 
+		}
+	};
+	
+	/**
 	 * Guarada el nivel de avance de la tarea
 	 */
 	private int avance=0;
+	
 
 	/**
 	 * Metodo que deben implementar las subclases para hacer la ejecución real de la 
@@ -68,6 +111,15 @@ public abstract class ProgressableTask {
 	 * @throws Throwable
 	 */
 	public abstract void doInBackground() throws Throwable;
+
+	/**
+	 * Metodo que deben implementar las subclases para cancelar la tarea
+	 * Si el metodo devuelve true la tarea se considera cancelada, si devuelve
+	 * false se considera que la tarea no ha podido ser cancelada y continua
+	 * su ejecución.
+	 *  
+	 */
+	public abstract boolean cancelResquestedAreYouOk();
 
 	
 	public ProgressableTask() {
@@ -102,6 +154,21 @@ public abstract class ProgressableTask {
 		th.start();
 	}
 	
+	
+	/**
+	 * Método llamdado cuando se quiere cancelar la tarea.
+	 * Si la tarea es cancelada se dispara un evento de cancelación
+	 * 
+	 * Devuelve true si se pudo cancelar, false si no 
+	 */
+	public boolean cancel() {
+		if (isCancelable() && cancelResquestedAreYouOk()) {
+			taskCanceled();
+			return true;
+		}
+		return false;
+	}
+	
 	private void initTask() {
 		this.state = TASK_RUNNING;
 		ProgressEvent evt = new ProgressEvent(this, ProgressEvent.JOB_INIT, 0);
@@ -111,6 +178,12 @@ public abstract class ProgressableTask {
 	private void endTask() {
 		this.state = TASK_DONE;
 		ProgressEvent evt = new ProgressEvent(this, ProgressEvent.JOB_END, 100);
+		fireEvent(evt);
+	}
+	
+	private void taskCanceled() {
+		this.state = TASK_CANCELED;
+		ProgressEvent evt = new ProgressEvent(this, ProgressEvent.JOB_CANCELED, this.avance);
 		fireEvent(evt);
 	}
 	
@@ -249,6 +322,22 @@ public abstract class ProgressableTask {
 		this.indeterminateProgress = indeterminateProgress;
 	}
 
+
+	public boolean isCancelable() {
+		return cancelable;
+	}
+
+	public void setCancelable(boolean cancelable) {
+		this.cancelable = cancelable;
+	}
+
+	public SimpleProgressListener getListener() {
+		return listener;
+	}
+
+	public void setListener(SimpleProgressListener listener) {
+		this.listener = listener;
+	}
 
 	/**
 	 * Gestión de eventos.

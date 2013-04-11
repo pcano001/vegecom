@@ -7,6 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResponseExtractor;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.veisite.vegecom.model.Provincia;
@@ -24,6 +25,9 @@ public class ProvinciaDAO {
 	@Autowired
 	private SerializationService serializationService;
 	
+	@Autowired
+	private DAOExceptionHandler exceptionHandler;
+	
 	private static final String ENTRYPOINT_URL = "/provincia";
 	
 	public Provincia getById(String id) {
@@ -32,7 +36,11 @@ public class ProvinciaDAO {
 		RequestCallback cb = null;
 		ResponseExtractor<Provincia> ex = 
 				new ObjectResponseExtractor<Provincia>(serializationService, Provincia.class);
-		return tp.execute(url, HttpMethod.GET, cb, ex, id);
+		try {
+			return tp.execute(url, HttpMethod.GET, cb, ex, id);
+		} catch (RestClientException rce) {
+			throw exceptionHandler.getDataAccessException(rce);
+		}
 	}
 
 	public Provincia save(Provincia provincia) {
@@ -45,7 +53,11 @@ public class ProvinciaDAO {
 		RequestCallback cb = null;
 		ResponseExtractor<List<Provincia>> ex = 
 				new ListResponseExtractor<Provincia>(serializationService, Provincia.class);
-		return tp.execute(url, HttpMethod.GET, cb, ex);
+		try {
+			return tp.execute(url, HttpMethod.GET, cb, ex);
+		} catch (RestClientException rce) {
+			throw exceptionHandler.getDataAccessException(rce);
+		}
 	}
 
 }

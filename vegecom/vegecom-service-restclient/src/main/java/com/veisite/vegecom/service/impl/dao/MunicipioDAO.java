@@ -33,6 +33,9 @@ public class MunicipioDAO {
 	@Autowired
 	private SerializationService serializationService;
 	
+	@Autowired
+	private DAOExceptionHandler exceptionHandler;
+	
 	private static final String ENTRYPOINT_URL = "/municipio";
 	
 	public Municipio getById(String id) {
@@ -41,7 +44,11 @@ public class MunicipioDAO {
 		RequestCallback cb = null;
 		ResponseExtractor<Municipio> ex = 
 				new ObjectResponseExtractor<Municipio>(serializationService, Municipio.class);
-		return tp.execute(url, HttpMethod.GET, cb, ex, id);
+		try {
+			return tp.execute(url, HttpMethod.GET, cb, ex, id);
+		} catch (RestClientException rce) {
+			throw exceptionHandler.getDataAccessException(rce);
+		}
 	}
 
 	public Municipio save(Municipio municipio) {
@@ -54,7 +61,11 @@ public class MunicipioDAO {
 		RequestCallback cb = null;
 		ResponseExtractor<List<Municipio>> ex = 
 				new ListResponseExtractor<Municipio>(serializationService, Municipio.class);
-		return tp.execute(url, HttpMethod.GET, cb, ex);
+		try {
+			return tp.execute(url, HttpMethod.GET, cb, ex);
+		} catch (RestClientException rce) {
+			throw exceptionHandler.getDataAccessException(rce);
+		}
 	}
 
 	public List<Municipio> getListbyProvincia(Provincia provincia) {
@@ -63,7 +74,11 @@ public class MunicipioDAO {
 		RequestCallback cb = null;
 		ResponseExtractor<List<Municipio>> ex = 
 				new ListResponseExtractor<Municipio>(serializationService, Municipio.class);
-		return tp.execute(url, HttpMethod.GET, cb, ex, provincia.getId());
+		try {
+			return tp.execute(url, HttpMethod.GET, cb, ex, provincia.getId());
+		} catch (RestClientException rce) {
+			throw exceptionHandler.getDataAccessException(rce);
+		}
 	}
 	
 	public Municipio getByNombre(String nombre) {
@@ -80,7 +95,11 @@ public class MunicipioDAO {
 		String pId="";
 		if (provincia!=null) pId=provincia.getId();
 		logger.debug("Quering server for Municipio List...");
-		tp.execute(url, HttpMethod.GET, cb, ex, pId);
+		try {
+			tp.execute(url, HttpMethod.GET, cb, ex, pId);
+		} catch (RestClientException rce) {
+			throw exceptionHandler.getDataAccessException(rce);
+		}
 		logger.debug("Reading municipio has ended correctly, exiting...");
 	}
 

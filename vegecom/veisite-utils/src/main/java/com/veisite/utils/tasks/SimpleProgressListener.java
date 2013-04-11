@@ -16,4 +16,6 @@ public interface SimpleProgressListener {
 	
 	public void end();
 	
+	public boolean canceled();
+	
 }

@@ -1,4 +1,4 @@
-package com.veisite.utils.tasks;
+package com.veisite.vegecom.ui.framework.component.dialogs;
 
 import java.awt.Dialog;
 import java.awt.Frame;
@@ -12,6 +12,11 @@ import javax.swing.BoxLayout;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
+import org.springframework.context.MessageSource;
+
+import com.veisite.utils.tasks.ProgressableTask;
+import com.veisite.utils.tasks.TaskException;
+
 public class ProgressableTaskListDialog extends JDialog {
 	
 	/**
@@ -23,25 +28,33 @@ public class ProgressableTaskListDialog extends JDialog {
 	
 	private Box progressPanel;
 	
+	private MessageSource messageSource;
 	
-	public ProgressableTaskListDialog(Frame owner, String title, ProgressableTask task) {
+	
+	public ProgressableTaskListDialog(Frame owner, String title, ProgressableTask task, 
+			MessageSource messageSource) {
 		super(owner, title);
 		if (task==null)
 			throw new java.lang.NullPointerException("Object task nulo");
+		this.messageSource = messageSource;
 		initDialog(task);
 	}
 
-	public ProgressableTaskListDialog(Dialog owner, String title, ProgressableTask task) {
+	public ProgressableTaskListDialog(Dialog owner, String title, ProgressableTask task,
+			MessageSource messageSource) {
 		super(owner, title);
 		if (task==null)
 			throw new java.lang.NullPointerException("Object task nulo");
+		this.messageSource = messageSource;
 		initDialog(task);
 	}
 
-	public ProgressableTaskListDialog(Window owner, String title, ProgressableTask task) {
+	public ProgressableTaskListDialog(Window owner, String title, ProgressableTask task,
+			MessageSource messageSource) {
 		super(owner, title);
 		if (task==null)
 			throw new java.lang.NullPointerException("Object task nulo");
+		this.messageSource = messageSource;
 		initDialog(task);
 	}
 	
@@ -96,7 +109,7 @@ public class ProgressableTaskListDialog extends JDialog {
 		private static final long serialVersionUID = 5511388846852092134L;
 
 		public TaskPanel(ProgressableTask task) {
-			super(task);
+			super(task, messageSource);
 		}
 
 		@Override
@@ -111,10 +124,11 @@ public class ProgressableTaskListDialog extends JDialog {
 	 * Devuele true si las tareas finalizaron su ejecución y 
 	 * false si el dialogo se cerró y alguna de las tareas sigue ejecutandonse.
 	 */
-	public static boolean showTaskListRunning(Window parent, String title, List<ProgressableTask> taskList) {
+	public static boolean showTaskListRunning(Window parent, String title, List<ProgressableTask> taskList,
+			MessageSource messageSource) {
 		if (taskList==null || taskList.size()<=0) return true;
 		ProgressableTaskListDialog dialog = 
-				new ProgressableTaskListDialog(parent, title, taskList.get(0));
+				new ProgressableTaskListDialog(parent, title, taskList.get(0), messageSource);
 		for (int i=1;i<taskList.size();i++)
 			dialog.addProgressableTask(taskList.get(i));
 		dialog.pack();

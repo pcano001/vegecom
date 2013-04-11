@@ -63,6 +63,7 @@ public class ClienteController extends DefaultController {
 		logger.debug("Requesting cliente with id='{}'",id);
 		try {
 			Cliente o = dataService.getById(id);
+			Thread.sleep(2000L);
 			if (o!=null) {
 				fillResponseHeader(response);
 				serializationService.write(response.getOutputStream(), o);

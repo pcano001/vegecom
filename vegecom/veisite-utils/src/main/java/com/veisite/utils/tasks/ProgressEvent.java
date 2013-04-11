@@ -16,7 +16,7 @@ public class ProgressEvent extends EventObject {
 	 * La tarea va a acomenzar
 	 */
 	public static final int JOB_INIT  	= 0;
-	/*
+	/**
 	 * La tarea ha finalizado
 	 */
 	public static final int JOB_END		= 1;
@@ -29,6 +29,10 @@ public class ProgressEvent extends EventObject {
 	 * La tarea se está ejecutando y se informa del progreso
 	 */
 	public static final int JOB_RUNNIG	= 3;
+	/**
+	 * La tarea ha sido cancelada y ha terminado su ejecución 
+	 */
+	public static final int JOB_CANCELED	= 4;
 	
 	
 	private int type;

@@ -274,7 +274,7 @@ public abstract class TerceroListPanel<T extends TerceroComercial> extends UIFra
 		String loadErrorText = "Error loading data...";
 		loadErrorText = 
 				uiService.getMessage("ui.components.ListTablePanel.LoadErrorTitleText",null,"Error loading data...");
-		ErrorInfo err = ErrorUtil.getErrorInfo(exception,loadErrorText);
+		ErrorInfo err = ErrorUtil.getErrorInfo(exception,loadErrorText,null);
 		JXErrorPane.showDialog(this, err);
 	}
 

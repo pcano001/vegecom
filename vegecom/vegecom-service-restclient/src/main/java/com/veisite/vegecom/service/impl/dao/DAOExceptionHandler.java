@@ -102,8 +102,10 @@ public class DAOExceptionHandler {
 		HelperRestErrorException cause = null;
 		String[] detail = restError.getDetailedMessages();
 		for (int i=detail.length-1; i>=0; i--) {
-			HelperRestErrorException e = new HelperRestErrorException(detail[i], cause);
-			cause = e;
+			if (cause==null || !detail[i].equals(cause.getMessage())) {
+				HelperRestErrorException e = new HelperRestErrorException(detail[i], cause);
+				cause = e;
+			}
 		}
 		RestErrorCode code = RestErrorCode.getErrorCode(restError.getCode());
 		String message = "";

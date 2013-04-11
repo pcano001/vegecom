@@ -12,12 +12,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.util.Assert;
 
 import com.veisite.vegecom.model.Cliente;
 import com.veisite.vegecom.model.exception.VegecomException;
 import com.veisite.vegecom.service.ClienteService;
 import com.veisite.vegecom.service.DataChangeListener;
+import com.veisite.vegecom.ui.error.ErrorUtil;
 import com.veisite.vegecom.ui.framework.module.UIFrameworkModule;
 import com.veisite.vegecom.ui.framework.service.UIFrameworkAbstractService;
 import com.veisite.vegecom.ui.service.ClienteUIService;
@@ -123,35 +125,41 @@ public class ClienteUIServiceImpl extends UIFrameworkAbstractService
 				excep = t;
 				error = true;
 			}
-			if (error) {
-				logger.error("Error retrieving customer from persistence service", excep);
-				String t = getMessage("ui.ClienteUIService.ErrorLoadClienteTitle", 
-						null, "Error retrieving customer");
-				String m = getMessage("ui.ClienteUIService.ErrorLoadClienteMessage", 
-						null, "Error retrieving customer data");
-				ErrorInfo err = new ErrorInfo(t, m,	excep.getMessage(), null, excep, null, null);
-				JXErrorPane.showDialog(parent==null ? getParentWindow() : parent, err);
-				return null;
-			}
-			// Si el cliente es null, no se ha encontrado
-			// Podría haber sido borrado
-			if (eCliente==null) {
-				logger.error("Error retrieving customer from persistence service. Not found.");
-				String t = getMessage("ui.ClienteUIService.ErrorNotExistClienteTitle", 
-						null, "Error retrieving customer");
-				String m = getMessage("ui.ClienteUIService.ErrorNotExistClienteMessage", 
-						null, "Customer not found. Please, refresh data");
-				ErrorInfo err = new ErrorInfo(t, m,	m, null, null, null, null);
+			if (eCliente==null || error) {
+				String t,m;
+				if (eCliente==null || excep instanceof DataRetrievalFailureException) {
+					logger.warn("Error retrieving customer from persistence service. Not found.");
+					t = getMessage("ui.ClienteUIService.ErrorNotExistClienteTitle", 
+							null, "Error retrieving customer");
+					m = getMessage("ui.ClienteUIService.ErrorNotExistClienteMessage", 
+							null, "Customer not found. Please, refresh data");
+				} else {
+					logger.warn("Error retrieving customer from persistence service", excep);
+					t = getMessage("ui.ClienteUIService.ErrorLoadClienteTitle", 
+							null, "Error retrieving customer");
+					m = getMessage("ui.ClienteUIService.ErrorLoadClienteMessage", 
+							null, "Error retrieving customer data");
+				}
+				ErrorInfo err = ErrorUtil.getErrorInfo(excep,t,m);
 				JXErrorPane.showDialog(getParentWindow(), err);
 				return null;
 			}
 		}
-		ClienteEditDialog dialog = new ClienteEditDialog(parent==null ? getParentWindow() : parent, eCliente, this);
-		dialog.setDataService(dataService);
-		dialog.setModalityType(ModalityType.MODELESS);
-		dialog.pack();
-		dialog.setLocationRelativeTo(dialog.getOwner());
-		dialog.setVisible(true);
+		// Puede producirse un error al abrir el dialogo de cliente ya que necesita acceso a datos
+		try {
+			ClienteEditDialog dialog = 
+					new ClienteEditDialog(parent==null ? getParentWindow() : parent, eCliente, this);
+			dialog.setDataService(dataService);
+			dialog.setModalityType(ModalityType.MODELESS);
+			dialog.pack();
+			dialog.setLocationRelativeTo(dialog.getOwner());
+			dialog.setVisible(true);
+		} catch (Throwable e) {
+			logger.warn("Error opening cliente edit dialog", e);
+			ErrorInfo err = ErrorUtil.getErrorInfo(e,null,null);
+			JXErrorPane.showDialog(getParentWindow(), err);
+			return null;
+		}
 		return eCliente;
 	}
 	

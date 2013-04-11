@@ -20,6 +20,7 @@ import org.springframework.dao.DataAccessException;
 
 import com.veisite.vegecom.model.Cliente;
 import com.veisite.vegecom.service.ClienteService;
+import com.veisite.vegecom.ui.error.ErrorUtil;
 import com.veisite.vegecom.ui.framework.component.dialogs.AbstractEditDialog;
 import com.veisite.vegecom.ui.framework.component.panels.ValidationMessagesPanel;
 import com.veisite.vegecom.ui.service.ClienteUIService;
@@ -112,7 +113,7 @@ public class ClienteEditDialog extends AbstractEditDialog {
 			}
 		}
 		// Ahora intentamos persistir los datos si tenemos servicio de persistencia
-		if (dataService!=null) {
+		if (isContentDirty() && dataService!=null) {
 			Throwable excep=null;
 			boolean error=false;
 			try {
@@ -130,7 +131,7 @@ public class ClienteEditDialog extends AbstractEditDialog {
 						null, "Error retrieving customer");
 				String m = uiService.getMessage("ui.ClienteEditDialog.ErrorSaveClienteMessage", 
 						null, "Error retrieving customer data");
-				ErrorInfo err = new ErrorInfo(t, m,	excep.getMessage(), null, excep, null, null);
+				ErrorInfo err = ErrorUtil.getErrorInfo(excep,t,m);
 				JXErrorPane.showDialog(getParent(), err);
 				return false;
 			}

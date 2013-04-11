@@ -20,11 +20,15 @@ import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 
-public class XlsExporter implements TableExporter {
+public class XlsExporter extends TableModelExporter {
 	
-	private static final Logger logger = LoggerFactory.getLogger(XlsExporter.class);
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+	
+	public XlsExporter() {
+		super(XLS_FORMAT);
+	}
 
-	public File saveTableModelToFile(TableModel model, File file, SimpleProgressListener listener) 
+	public File saveTableModelToFile(File file, TableModel model, SimpleProgressListener listener) 
 			throws IOException {
 		
 		// Construir la hoja xls
@@ -38,40 +42,47 @@ public class XlsExporter implements TableExporter {
 			listener.init();
 		}
 
-		// Escribir las cabeceras
-		for (int i=0;i<columns;i++) {
-			Label label = new Label(i, 0, model.getColumnName(i));
-			try {
-				sheet.addCell(label);
-			} catch (WriteException we) {
-				throw new IOException(we);
-			}
-		}
-		if (listener!=null) listener.setProgress(0);
-		// Escribir los datos
-		for (int r=0;r<model.getRowCount();r++) {
-			for (int c=0;c<columns;c++) 
+		boolean success = false;
+		try {
+			// Escribir las cabeceras
+			for (int i=0;i<columns;i++) {
+				Label label = new Label(i, 0, model.getColumnName(i));
 				try {
-					addCell(sheet, c,r+1,model.getValueAt(r, c));
+					sheet.addCell(label);
 				} catch (WriteException we) {
 					throw new IOException(we);
-				} 
-			if (listener!=null) listener.setProgress(r+1);
+				}
+			}
+			if (listener!=null && listener.canceled()) return file;
+			if (listener!=null) listener.setProgress(0);
+			// Escribir los datos
+			for (int r=0;r<model.getRowCount();r++) {
+				for (int c=0;c<columns;c++) 
+					try {
+						addCell(sheet, c,r+1,model.getValueAt(r, c));
+					} catch (WriteException we) {
+						throw new IOException(we);
+					} 
+				if (listener!=null && listener.canceled()) return file;
+				if (listener!=null) listener.setProgress(r+1);
+			}
+			
+			workbook.write();
+			success = true;
+		} finally {
+			try {
+				workbook.close();
+			} catch (WriteException we) {
+				if (success) throw new IOException(we);
+			}
 		}
-		
-		workbook.write();
-		try {
-			workbook.close();
-		} catch (WriteException we) {
-			throw new IOException(we);
-		} 
 
-		if (listener!=null) listener.end();
+		if (listener!=null && !listener.canceled()) listener.end();
 
 		return file;
 	}
 
-	private static void addCell(WritableSheet sheet, int column, int row, Object value) throws WriteException {
+	private void addCell(WritableSheet sheet, int column, int row, Object value) throws WriteException {
 		if (value==null) return;
 		try {
 			if (value instanceof Date) {

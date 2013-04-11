@@ -30,8 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 
-import com.veisite.utils.tasks.ProgressableTaskDialog;
 import com.veisite.vegecom.model.exception.VegecomException;
+import com.veisite.vegecom.ui.framework.component.dialogs.ProgressableTaskDialog;
 import com.veisite.vegecom.ui.framework.component.panels.DefaultTableStatusBar;
 import com.veisite.vegecom.ui.framework.component.table.export.ExportTableModelTask;
 import com.veisite.vegecom.ui.framework.component.table.export.TableModelExporter;
@@ -374,12 +374,12 @@ public abstract class AbstractListTablePanel<T> extends JPanel {
 		Cursor c = table.getCursor();
 		table.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		try {
-			TableModelExporter te = new TableModelExporter(format);
+			TableModelExporter te = TableModelExporter.getExporter(format);
 			TableViewModelWraper model = new TableViewModelWraper(table);
 
 	        ExportTableModelTask task = new ExportTableModelTask(model, te, exportTaskText);
 	        Window parent = SwingUtilities.getWindowAncestor(this);
-			boolean ret = ProgressableTaskDialog.showTaskRunning(parent, exportTaskText, task);
+			boolean ret = ProgressableTaskDialog.showTaskRunning(parent, exportTaskText, task, messageSource);
 			// Si la tarea sigue ejecutando es que se ha cancelado, salir.
 			if (!ret) return;
 			if (task.isCanceled()) return;

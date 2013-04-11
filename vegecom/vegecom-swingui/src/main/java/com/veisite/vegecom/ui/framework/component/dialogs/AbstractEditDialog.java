@@ -22,6 +22,8 @@ import javax.swing.SwingUtilities;
 import org.springframework.context.MessageSource;
 import org.springframework.util.Assert;
 
+import com.veisite.vegecom.ui.framework.UIFramework;
+
 /**
  * Dialog simple que muestra un boton de cerrar en la parte baja
  * y muestra en el centro el panel que se le pasa como parametro
@@ -35,27 +37,6 @@ public abstract class AbstractEditDialog extends JDialog {
 	 */
 	private static final long serialVersionUID = 8937884809349987950L;
 	
-	/**
-	 * Clave en recurso de mensajes para texto boton ok
-	 */
-	public static final String OK_BUTTON_MESSAGE_KEY = 
-			"ui.components.dialogs.OkButtonText";
-	/**
-	 * Clave en recurso de mensajes para texto boton cancel
-	 */
-	public static final String CANCEL_BUTTON_MESSAGE_KEY = 
-			"ui.components.dialogs.CancelButtonText";
-	/**
-	 * Clave en recurso de mensajes para pregunta de descartar cambios
-	 */
-	public static final String DISCARDCHANGE_QUESTION_MESSAGE_KEY = 
-			"ui.components.dialogs.AbstractEditDialog.DiscardChangeQuestion";
-	/**
-	 * Clave en recurso de mensajes para titulo dialogo de descartar cambios
-	 */
-	public static final String DISCARDCHANGE_TITLE_MESSAGE_KEY = 
-			"ui.components.dialogs.AbstractEditDialog.DiscardChangeTitle";
-
 	/**
 	 * Almacena la opción de salida del dialog. Puede ser:
 	 * JOptionPane.NO_OPTION
@@ -156,10 +137,10 @@ public abstract class AbstractEditDialog extends JDialog {
 			contentPanel.add(contentComponent, BorderLayout.CENTER);
 		
 		String s;
-		s = messageSource.getMessage(OK_BUTTON_MESSAGE_KEY,null,"Ok",Locale.getDefault());
+		s = messageSource.getMessage(UIFramework.OKBUTTONTEXT_MSGKEY,null,"Ok",Locale.getDefault());
 		okButton = new JButton(s);
 		okButton.addActionListener(bl);
-		s = messageSource.getMessage(CANCEL_BUTTON_MESSAGE_KEY,null,"Cancel",Locale.getDefault());
+		s = messageSource.getMessage(UIFramework.CANCELBUTTONTEXT_MSGKEY,null,"Cancel",Locale.getDefault());
 		cancelButton = new JButton(s);
 		cancelButton.addActionListener(bl);
 
@@ -261,10 +242,10 @@ public abstract class AbstractEditDialog extends JDialog {
 	private boolean wantDiscardChanges() {
 		if (!isContentDirty()) return true;
 		String q;
-		q = messageSource.getMessage(DISCARDCHANGE_QUESTION_MESSAGE_KEY, null, 
+		q = messageSource.getMessage(UIFramework.EDITDIALOG_DISCARDQUESTION_MSGKEY, null, 
 						"Do you want to discard changes?",Locale.getDefault());
 		String t;
-		t = messageSource.getMessage(DISCARDCHANGE_TITLE_MESSAGE_KEY, null, 
+		t = messageSource.getMessage(UIFramework.EDITDIALOG_DISCARDTITLE_MSGKEY, null, 
 				"Cancel changes",Locale.getDefault());
 		/* Pedir confirmación de cierre */
 		int confirm = 

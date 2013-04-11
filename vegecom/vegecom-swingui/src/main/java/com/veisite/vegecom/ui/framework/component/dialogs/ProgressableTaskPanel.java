@@ -1,17 +1,28 @@
-package com.veisite.utils.tasks;
+package com.veisite.vegecom.ui.framework.component.dialogs;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Locale;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+
+import org.springframework.context.MessageSource;
+
+import com.veisite.utils.tasks.ProgressEvent;
+import com.veisite.utils.tasks.ProgressEventListener;
+import com.veisite.utils.tasks.ProgressableTask;
+import com.veisite.vegecom.ui.framework.UIFramework;
 
 public abstract class ProgressableTaskPanel extends JPanel {
 
@@ -21,9 +32,10 @@ public abstract class ProgressableTaskPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	private ProgressableTask task;
-//	private JLabel iconLabel;
+	private JButton cancelButton;
 	private MultiLineJLabel message;
 	private JProgressBar progressBar;
+	private MessageSource messageSource;
 	
 	ProgressEventListener pel = new ProgressEventListener() {
 		@Override
@@ -37,9 +49,10 @@ public abstract class ProgressableTaskPanel extends JPanel {
 		}
 	};
 
-	public ProgressableTaskPanel(ProgressableTask task) {
+	public ProgressableTaskPanel(ProgressableTask task, MessageSource messageSource) {
 		super();
 		this.task=task;
+		this.messageSource = messageSource;
 		initPanel();
 		task.addEventListener(pel);
 	}
@@ -63,6 +76,16 @@ public abstract class ProgressableTaskPanel extends JPanel {
 		progressBar.setStringPainted(false);
 		progressBar.setPreferredSize(new Dimension(150,20));
 		add(progressBar,c);
+		String t = messageSource.getMessage(UIFramework.CANCELBUTTONTEXT_MSGKEY, null, "Cancel", Locale.getDefault());
+		cancelButton = new JButton(t);
+		cancelButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				cancelTask();
+			}
+		});
+		c.gridy=1;c.gridx=1;
+		if (task.isCancelable()) add(cancelButton,c);
 	}
 	
 	protected void updateProgress(ProgressEvent evt) {
@@ -72,13 +95,7 @@ public abstract class ProgressableTaskPanel extends JPanel {
 		progressBar.setStringPainted(!task.isIndeterminateProgress());
 		switch (evt.getType()) {
 		case ProgressEvent.JOB_INIT:
-			if (!task.isIndeterminateProgress())
-				progressBar.setValue(evt.getProgress());
-			break;
 		case ProgressEvent.JOB_RUNNIG:
-			if (!task.isIndeterminateProgress())
-				progressBar.setValue(evt.getProgress());
-			break;
 		case ProgressEvent.JOB_END:
 			if (!task.isIndeterminateProgress())
 				progressBar.setValue(evt.getProgress());
@@ -89,11 +106,22 @@ public abstract class ProgressableTaskPanel extends JPanel {
 	
 	protected abstract void taskEnded();
 
+	protected void cancelTask() {
+		if (task.cancel()) {
+			cancelButton.setEnabled(false);
+			taskEnded();
+		}
+	}
+
 	/**
 	 * @return the task
 	 */
 	public ProgressableTask getTask() {
 		return task;
+	}
+	
+	public void setCancelText(String text) {
+		if (cancelButton!=null) cancelButton.setText(text);
 	}
 	
 	

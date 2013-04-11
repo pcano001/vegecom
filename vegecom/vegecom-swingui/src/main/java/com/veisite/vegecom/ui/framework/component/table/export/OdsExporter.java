@@ -19,14 +19,17 @@ import org.w3c.dom.Node;
 
 import com.veisite.utils.tasks.SimpleProgressListener;
 
-public class OdsExporter implements TableExporter {
+public class OdsExporter extends TableModelExporter {
 	
 	private static final Logger logger = LoggerFactory.getLogger(OdsExporter.class);
 	
+	public OdsExporter() {
+		super(ODS_FORMAT);
+	}
+	
 	@Override
-	public File saveTableModelToFile(TableModel model, File file, SimpleProgressListener listener) 
+	public File saveTableModelToFile(File file, TableModel model, SimpleProgressListener listener) 
 			throws IOException {
-
 		try {
 			Class.forName("org.jopendocument.dom.spreadsheet.SpreadSheet", 
 		    		  false, TableModelExporter.class.getClassLoader());
@@ -40,7 +43,7 @@ public class OdsExporter implements TableExporter {
 		listener.setMaximum(-1);
 		listener.init();
 		SpreadSheet.createEmpty(model).saveAs(file);
-		listener.end();
+		if (listener!=null && !listener.canceled()) listener.end();
 		return file;
 	}
 	
@@ -76,10 +79,12 @@ public class OdsExporter implements TableExporter {
 			Cell cell = sheet.getCellByPosition(i, 0);
 			cell.setStringValue(model.getColumnName(i));
 		}
+		if (listener!=null && listener.canceled()) return file;
 		if (listener!=null) listener.setProgress(0);
 		// Escribir los datos
 		for (int r=0;r<model.getRowCount();r++) {
 			for (int c=0;c<columns;c++) addCell(sheet, c,r+1,model.getValueAt(r, c));
+			if (listener!=null && listener.canceled()) return file;
 			if (listener!=null) listener.setProgress(r+1);
 		}
 		
@@ -89,7 +94,7 @@ public class OdsExporter implements TableExporter {
 			throw new IOException(e);
 		}
 		
-		if (listener!=null) listener.end();
+		if (listener!=null && !listener.canceled()) listener.end();
 		
 		return file;
 	}

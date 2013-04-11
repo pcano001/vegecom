@@ -29,4 +29,12 @@ public class SpringContextLoader extends ProgressableTask {
 	public ClassPathXmlApplicationContext getContext() {
 		return context;
 	}
+
+	/**
+	 * Cannot cancel.
+	 */
+	@Override
+	public boolean cancelResquestedAreYouOk() {
+		return false;
+	}
 }

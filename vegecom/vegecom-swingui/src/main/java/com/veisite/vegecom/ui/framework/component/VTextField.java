@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,8 +22,8 @@ import org.jdesktop.swingx.prompt.BuddySupport;
 
 import com.veisite.utils.binding.BindTarget;
 import com.veisite.utils.binding.IBindableTo;
+import com.veisite.vegecom.ui.framework.ResourcesUtil;
 import com.veisite.vegecom.ui.framework.component.util.IValidatableComponent;
-import com.veisite.vegecom.ui.framework.util.UIResources;
 
 public class VTextField extends JXTextField implements IActivableComponent, IValidatableComponent,  
 														IBindableTo<String> {
@@ -58,6 +59,10 @@ public class VTextField extends JXTextField implements IActivableComponent, IVal
 	 */
 	private JLabel validationBuddy;
 	
+	/**
+	 * Imagen de icono
+	 */
+	private static ImageIcon icon = null;
 
 	
 	public VTextField() {
@@ -93,8 +98,18 @@ public class VTextField extends JXTextField implements IActivableComponent, IVal
                 }
             }
         });
-		ImageIcon im = UIResources.getIcon16("emblem-important-3"); 
+		ImageIcon im = getBuddyIcon();
 		if (im!=null) validationBuddy = new JLabel(im);
+	}
+	
+	private static ImageIcon getBuddyIcon() {
+		if (icon==null) {
+			String path = (VTextField.class.getPackage().getName()).replace('.', '/');
+			String resource = path+"/images/emblem-important-316.png";
+			URL url = ResourcesUtil.getResource(resource);
+			if (url!=null) icon = new ImageIcon(url);
+		}
+		return icon;
 	}
 
 	
@@ -188,7 +203,8 @@ public class VTextField extends JXTextField implements IActivableComponent, IVal
 			List<Component> lb = getBuddies(BuddySupport.Position.RIGHT);
 			if (lb.contains(validationBuddy)) return;
 			else {
-				addBuddy(validationBuddy, BuddySupport.Position.RIGHT);
+				if (validationBuddy!=null) 
+					addBuddy(validationBuddy, BuddySupport.Position.RIGHT);
 			}
 		}
 	}
