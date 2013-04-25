@@ -183,4 +183,9 @@ public class JsonSerializationService implements SerializationService {
 		}
 	}
 
+	@Override
+	public String getContentType() {
+		return "application/json";
+	}
+
 }

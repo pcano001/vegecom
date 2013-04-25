@@ -20,70 +20,55 @@ import com.veisite.vegecom.model.Cliente;
 import com.veisite.vegecom.rest.RestClientException;
 import com.veisite.vegecom.rest.RestException;
 import com.veisite.vegecom.rest.RestServerException;
+import com.veisite.vegecom.rest.security.RestSecurity;
+import com.veisite.vegecom.rest.security.RestUnauthorizedException;
 import com.veisite.vegecom.service.ClienteService;
 import com.veisite.vegecom.service.SerializationMappingException;
 import com.veisite.vegecom.service.SerializationParseException;
 import com.veisite.vegecom.service.SerializationService;
+import com.veisite.vegecom.service.security.SecurityService;
 
 @Controller
-@RequestMapping(value="/rs/cliente", produces="application/json")
-public class ClienteController extends DefaultController {
+@RequestMapping(value="/apiKey", produces="application/json")
+public class SessionManagerController extends DefaultController {
 	
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	
 	/**
 	 * services
 	 */
-	private ClienteService dataService;
+	private SecurityService securityService;
 	private SerializationService serializationService;
 	
 	@Inject
-	public ClienteController(ClienteService dataService, 
+	public SessionManagerController(SecurityService securityService, 
 							SerializationService serializationService) {
-		this.dataService = dataService;
+		this.securityService = securityService;
 		this.serializationService = serializationService;
-	}
-	
-	@RequestMapping(value="/list", method=RequestMethod.GET)
-	public @ResponseBody void getList(HttpServletResponse response) throws RestException {
-		logger.debug("Requesting cliente list");
-		try {
-			List<Cliente> l = dataService.getList();
-			fillResponseHeader(response, serializationService.getContentType());
-			serializationService.writeList(response.getOutputStream(), l);
-		} catch (Throwable t) {
-			throw new RestServerException(t);
-		}
-		logger.debug("Requesting cliente list returned successfully.");
-	}
-
-	@RequestMapping(value="/{id}", method=RequestMethod.GET)
-	public @ResponseBody void  getById(HttpServletResponse response, @PathVariable Long id) 
-			throws RestException {
-		logger.debug("Requesting cliente with id='{}'",id);
-		try {
-			Cliente o = dataService.getById(id);
-			Thread.sleep(2000L);
-			if (o!=null) {
-				fillResponseHeader(response, serializationService.getContentType());
-				serializationService.write(response.getOutputStream(), o);
-			} else {
-				logger.debug("Cliente {} not found.",id);
-				throw new RestClientException( 
-						new DataRetrievalFailureException("Cliente with id="+id+" not found"));
-			}
-		} catch (RestException re) {
-			throw re;
-		} catch (Throwable t) {
-			throw new RestServerException(t);
-		}
-		logger.debug("Requesting cliente returned successfully.");
 	}
 	
 	@RequestMapping(value="", method=RequestMethod.POST, consumes="application/json")
 	public @ResponseBody void create(HttpServletRequest request, HttpServletResponse response)
 			throws RestException {
-		logger.debug("Requesting cliente creation");
+		logger.debug("Requesting new apiKey creation");
+		// Comprobamos que la petición viene por un canal seguro.
+		if (!request.isSecure()) {
+			throw new RestClientException(
+				new InvalidDataAccessApiUsageException("New sessions must be requested in an SSL channel."));
+		}
+		// Obtenemos los parametros necesarios de la petición (usuario y contraseña)
+		String user = request.getParameter(RestSecurity.USER_PARAMETER);
+		String password = request.getParameter(RestSecurity.PASSWORD_PARAMETER);
+		if (user==null || password==null) {
+			throw new RestClientException(
+				new InvalidDataAccessApiUsageException("Invalid user or password"));
+		}
+		// Validamos el usuario
+		try {
+			securityService.login(user, password);
+		} catch (Throwable t) {
+			throw new RestUnauthorizedException("Login failed. Invalid user or password");
+		}
 		Cliente o = null;
 		try {
 			o = serializationService.read(request.getInputStream(), Cliente.class);
@@ -107,7 +92,7 @@ public class ClienteController extends DefaultController {
 		}
 		try {
 			// Dar de alta el cliente
-			o = dataService.save(o);
+			o = securityService.save(o);
 			// Se devuelve en la respuesta el nuevo cliente con su id.
 			fillResponseHeader(response, serializationService.getContentType());
 			serializationService.write(response.getOutputStream(), o);
@@ -144,7 +129,7 @@ public class ClienteController extends DefaultController {
 		}
 		try {
 			// Actualizar el cliente
-			o = dataService.save(o);
+			o = securityService.save(o);
 			// Se devuelve en la respuesta el cliente actualizado.
 			fillResponseHeader(response, serializationService.getContentType());
 			serializationService.write(response.getOutputStream(), o);
@@ -161,7 +146,7 @@ public class ClienteController extends DefaultController {
 		Cliente o = null;
 		try {
 			// Borrar el cliente
-			o = dataService.remove(id);
+			o = securityService.remove(id);
 			if (o==null) throw new RestClientException(
 					new DataRetrievalFailureException("delete Cliente: not found"));
 			// Se devuelve en la respuesta el cliente borrado.

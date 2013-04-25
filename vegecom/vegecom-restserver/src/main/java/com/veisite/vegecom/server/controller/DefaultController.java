@@ -5,9 +5,9 @@ import javax.servlet.http.HttpServletResponseWrapper;
 
 public class DefaultController {
 
-	protected void fillResponseHeader(HttpServletResponse response) {
+	protected void fillResponseHeader(HttpServletResponse response, String contentType) {
 		HttpServletResponseWrapper wrapper = new HttpServletResponseWrapper(response);
-		wrapper.setContentType("application/json;charset=UTF-8");
+		wrapper.setContentType(contentType+";charset=UTF-8");
 	}
 	
 }

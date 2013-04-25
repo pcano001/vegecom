@@ -24,5 +24,7 @@ public interface SerializationService {
 	public <T extends Object> T read(InputStream input, Class<T> type) throws SerializationException;
 
 	public <T extends Object> T read(String content, Class<T> type) throws SerializationException;
+	
+	public String getContentType();
 
 }

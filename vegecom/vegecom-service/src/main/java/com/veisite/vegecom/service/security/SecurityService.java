@@ -28,5 +28,4 @@ public interface SecurityService {
 	 */
 	public boolean hasRole(String role); 
 
-
 }
