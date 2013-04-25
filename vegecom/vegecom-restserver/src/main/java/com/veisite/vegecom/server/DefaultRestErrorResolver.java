@@ -23,10 +23,15 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.veisite.vegecom.rest.RestClientException;
 import com.veisite.vegecom.rest.RestException;
+import com.veisite.vegecom.rest.RestInvalidApiPathException;
 import com.veisite.vegecom.rest.RestServerException;
 import com.veisite.vegecom.rest.error.RestError;
 import com.veisite.vegecom.rest.error.RestErrorCode;
 import com.veisite.vegecom.rest.error.RestErrorResolver;
+import com.veisite.vegecom.rest.security.RestExpiredSessionException;
+import com.veisite.vegecom.rest.security.RestInvalidSessionException;
+import com.veisite.vegecom.rest.security.RestSecurityException;
+import com.veisite.vegecom.rest.security.RestUnauthenticatedException;
 
 public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourceAware {
 	
@@ -69,7 +74,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 		RestError err = new RestErrorTemplate();
 		resolveInternalException(ex,err,locale);
 		if (err.getStatus()==null) err.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-		if (err.getCode()==0) err.setCode(RestErrorCode.UNKNOW.value());
+		if (err.getCode()==0) err.setCode(RestErrorCode.UNKNOW.getValue());
 		if (err.getMessage()==null) {
 			String m = getMessage(RestErrorCode.UNKNOW.getMessageKey(),null,"Unexpected error", locale);
 			err.setMessage(m);
@@ -99,16 +104,47 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 	}
 	
 	private RestError resolveRestClientException(RestClientException rce, Locale locale) {
+		if (rce instanceof RestSecurityException) 
+			return resolveRestSecurityException((RestSecurityException)rce, locale);
+		if (rce instanceof RestInvalidApiPathException) 
+			return resolveRestInvalidApiPath((RestInvalidApiPathException)rce, locale);
 		RestError err = new RestErrorTemplate();
 		resolveInternalException(rce.getCause(), err, locale);
-		if (err.getCode() == 0) err.setCode(RestErrorCode.BAD_REQUEST.value());
+		if (err.getCode() == 0) err.setCode(RestErrorCode.BAD_REQUEST.getValue());
+		if (err.getStatus() == null) err.setStatus(HttpStatus.BAD_REQUEST);
 		return err;
 	}
 
 	private RestError resolveRestServerException(RestServerException rce, Locale locale) {
 		RestError err = new RestErrorTemplate();
 		resolveInternalException(rce.getCause(), err, locale);
-		if (err.getCode() == 0) err.setCode(RestErrorCode.INTERNAL_SERVER_ERROR.value());
+		if (err.getCode() == 0) err.setCode(RestErrorCode.INTERNAL_SERVER_ERROR.getValue());
+		if (err.getStatus() == null) err.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+		return err;
+	}
+	
+	private RestError resolveRestSecurityException(RestSecurityException rce, Locale locale) {
+		RestError err = new RestErrorTemplate();
+		err.setStatus(HttpStatus.UNAUTHORIZED);
+		RestErrorCode ec = RestErrorCode.UNAUTHORIZED_REQUEST;
+		if (rce instanceof RestUnauthenticatedException) ec = RestErrorCode.UNAUTHENTICATED_REQUEST; 
+		if (rce instanceof RestInvalidSessionException) ec = RestErrorCode.SESSION_INVALID; 
+		if (rce instanceof RestExpiredSessionException) ec = RestErrorCode.SESSION_EXPIRED; 
+		err.setCode(ec.getValue());
+		String m = getMessage(ec.getMessageKey(), null, rce.getMessage(), locale);
+		err.setMessage(m);
+		err.setDetailedMessages(new String[] {rce.getMessage()});
+		return err;
+	}
+	
+	private RestError resolveRestInvalidApiPath(RestInvalidApiPathException rce, Locale locale) {
+		RestError err = new RestErrorTemplate();
+		err.setStatus(HttpStatus.NOT_FOUND);
+		RestErrorCode ec = RestErrorCode.PATH_NOT_FOUND;
+		err.setCode(ec.getValue());
+		String m = getMessage(ec.getMessageKey(), null, rce.getMessage(), locale);
+		err.setMessage(m);
+		err.setDetailedMessages(new String[] {rce.getMessage()});
 		return err;
 	}
 	
@@ -126,7 +162,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 	private void resolveDataAccessException(DataAccessException ex, RestError err, Locale locale) {
 		if (ex instanceof DataRetrievalFailureException) {
 			err.setStatus(HttpStatus.NOT_FOUND);
-			err.setCode(RestErrorCode.RESOURCE_NOT_FOUND.value());
+			err.setCode(RestErrorCode.RESOURCE_NOT_FOUND.getValue());
 			String m = getMessage(RestErrorCode.RESOURCE_NOT_FOUND.getMessageKey(), null, 
 					"Resource not found", locale);
 			err.setMessage(m);
@@ -135,7 +171,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 		}
 		if (ex instanceof InvalidDataAccessApiUsageException) {
 			err.setStatus(HttpStatus.BAD_REQUEST);
-			err.setCode(RestErrorCode.INVALID_ARGUMENT.value());
+			err.setCode(RestErrorCode.INVALID_ARGUMENT.getValue());
 			String m = getMessage(RestErrorCode.INVALID_ARGUMENT.getMessageKey(), null, 
 					"Illegal arguments on request",locale);
 			err.setMessage(m);
@@ -144,7 +180,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 		}
 		if (ex instanceof ConcurrencyFailureException) {
 			err.setStatus(HttpStatus.CONFLICT);
-			err.setCode(RestErrorCode.DATACONCURRENCY_CONFLICT.value());
+			err.setCode(RestErrorCode.DATACONCURRENCY_CONFLICT.getValue());
 			String m = getMessage(RestErrorCode.DATACONCURRENCY_CONFLICT.getMessageKey(), null, 
 					"Update Conflict. It seems that data has been updated or deleted by another session",
 					locale);
@@ -154,7 +190,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 		}
 		if (ex instanceof DataIntegrityViolationException) {
 			err.setStatus(HttpStatus.BAD_REQUEST);
-			err.setCode(RestErrorCode.DATAINTEGRITY_VIOLATION.value());
+			err.setCode(RestErrorCode.DATAINTEGRITY_VIOLATION.getValue());
 			String m = getMessage(RestErrorCode.DATAINTEGRITY_VIOLATION.getMessageKey(), null, 
 					"Data integrity violation",locale);
 			err.setMessage(m);
@@ -163,7 +199,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 		}
 		if (ex instanceof DataAccessResourceFailureException) {
 			err.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-			err.setCode(RestErrorCode.DATASOURCE_FAILED.value());
+			err.setCode(RestErrorCode.DATASOURCE_FAILED.getValue());
 			String m = getMessage(RestErrorCode.DATASOURCE_FAILED.getMessageKey(), null, 
 					"Error connecting to database",locale);
 			err.setMessage(m);
@@ -171,7 +207,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 			return;
 		}
 		err.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-		err.setCode(RestErrorCode.DATAACCESS_FAILED.value());
+		err.setCode(RestErrorCode.DATAACCESS_FAILED.getValue());
 		String m = getMessage(RestErrorCode.DATAACCESS_FAILED.getMessageKey(), null, 
 				"Error data access exception",locale);
 		err.setMessage(m);
@@ -183,7 +219,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 		// Comprobar error Json
 		if (ex instanceof JsonParseException || ex instanceof JsonMappingException) {
 			err.setStatus(HttpStatus.BAD_REQUEST);
-			err.setCode(RestErrorCode.INVALID_ARGUMENT.value());
+			err.setCode(RestErrorCode.INVALID_ARGUMENT.getValue());
 			String m = getMessage(RestErrorCode.INVALID_ARGUMENT.getMessageKey(), null, 
 					"Illegal arguments on request",locale);
 			err.setMessage(m);
@@ -191,7 +227,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 			return;
 		}
 		err.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-		err.setCode(RestErrorCode.GENERIC_IOEXCEPTION.value());
+		err.setCode(RestErrorCode.GENERIC_IOEXCEPTION.getValue());
 		String m = getMessage(RestErrorCode.GENERIC_IOEXCEPTION.getMessageKey(), null, 
 				"Server error in response generation.",locale);
 		err.setMessage(m);
@@ -201,22 +237,22 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 	private void resolveTransactionException(TransactionException ex, RestError err, Locale locale) {
 		// No se puede crear la transacción. Posible perdida de conectividad a la BD
 		err.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-		err.setCode(RestErrorCode.INTERNAL_SERVER_ERROR.value());
+		err.setCode(RestErrorCode.INTERNAL_SERVER_ERROR.getValue());
 		Throwable ex1 = ex.getCause()==null? ex : ex.getCause();
 		String m;
 		if (ex1 instanceof PersistenceException) {
 			ex1 = ex1.getCause()==null? ex : ex1.getCause();
 			if (ex1 instanceof JDBCException) {
-				err.setCode(RestErrorCode.DATASOURCE_CONNECTIONFAILED.value());
+				err.setCode(RestErrorCode.DATASOURCE_CONNECTIONFAILED.getValue());
 				m = getMessage(RestErrorCode.DATASOURCE_CONNECTIONFAILED.getMessageKey(), null, 
 						"Error connecting to database",locale);
 			} else {
-				err.setCode(RestErrorCode.DATAACCESS_PERSISTENCEFAILED.value());
+				err.setCode(RestErrorCode.DATAACCESS_PERSISTENCEFAILED.getValue());
 				m = getMessage(RestErrorCode.DATAACCESS_PERSISTENCEFAILED.getMessageKey(), null, 
 						"Error accesing persistence layer",locale);
 			}
 		} else {
-			err.setCode(RestErrorCode.DATAACCESS_TRANSACTIONFAILED.value());
+			err.setCode(RestErrorCode.DATAACCESS_TRANSACTIONFAILED.getValue());
 			m = getMessage(RestErrorCode.DATAACCESS_TRANSACTIONFAILED.getMessageKey(), null, 
 					"Error instantiating required transaction",locale);
 		}
@@ -234,5 +270,5 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 			setMoreInfoUrl("info@veisite.com");
 		}
 	}
-	
+
 }

@@ -42,5 +42,5 @@
     	<property name="serializationService" ref="serializationService"/>
     	<property name="errorResolver" ref="errorResolver"/>
     </bean>
-
+    
 </beans>

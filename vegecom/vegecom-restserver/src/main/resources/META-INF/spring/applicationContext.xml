@@ -21,5 +21,24 @@
 	<context:component-scan base-package="com.veisite.vegecom"/>
 
     <context:annotation-config/>
+
+    <!--
+        Security with Apache Shiro
+    -->
+    <bean id="securityManager" class="org.apache.shiro.mgt.DefaultSecurityManager">
+    </bean>
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+	<!-- For simplest integration, so that all SecurityUtils.* methods work in all cases, -->
+	<!-- make the securityManager bean a static singleton. DO NOT do this in web -->
+	<!-- applications - see the 'Web Applications' section below instead. -->
+	<bean
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="staticMethod"
+			value="org.apache.shiro.SecurityUtils.setSecurityManager" />
+		<property name="arguments" ref="securityManager" />
+	</bean>    
+
+    <bean id="securityFilterBean" 
+    		class="com.veisite.vegecom.rest.security.filter.ShiroSecurityFilter"/>
     
 </beans>

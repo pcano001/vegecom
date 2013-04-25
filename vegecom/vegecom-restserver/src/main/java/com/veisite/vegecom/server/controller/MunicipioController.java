@@ -23,7 +23,7 @@ import com.veisite.vegecom.service.ProvinciaService;
 import com.veisite.vegecom.service.SerializationService;
 
 @Controller
-@RequestMapping("/municipio")
+@RequestMapping("/rs/municipio")
 public class MunicipioController extends DefaultController {
 	
 	private Logger logger = LoggerFactory.getLogger(getClass());

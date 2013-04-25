@@ -19,7 +19,7 @@ import com.veisite.vegecom.service.ProvinciaService;
 import com.veisite.vegecom.service.SerializationService;
 
 @Controller
-@RequestMapping("/provincia")
+@RequestMapping("/rs/provincia")
 public class ProvinciaController {
 	
 	private Logger logger = LoggerFactory.getLogger(getClass());

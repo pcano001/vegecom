@@ -26,7 +26,7 @@ import com.veisite.vegecom.service.SerializationParseException;
 import com.veisite.vegecom.service.SerializationService;
 
 @Controller
-@RequestMapping(value="/cliente", produces="application/json")
+@RequestMapping(value="/rs/cliente", produces="application/json")
 public class ClienteController extends DefaultController {
 	
 	private Logger logger = LoggerFactory.getLogger(getClass());

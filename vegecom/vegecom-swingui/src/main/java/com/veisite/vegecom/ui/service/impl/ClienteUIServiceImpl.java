@@ -234,7 +234,7 @@ public class ClienteUIServiceImpl extends UIFrameworkAbstractService
 	@Override
 	public void itemChanged(Cliente item) {
 		int index = getModelIndexForItem(item);
-		if (index>=0) listModel.setItemAt(index, item);
+		if (index>=0 && listModel!=null) listModel.setItemAt(index, item);
 	}
 
 
@@ -244,7 +244,7 @@ public class ClienteUIServiceImpl extends UIFrameworkAbstractService
 	@Override
 	public void itemRemoved(Cliente item) {
 		int index = getModelIndexForItem(item);
-		if (index>=0) listModel.delItemAt(index);
+		if (index>=0 && listModel!=null) listModel.delItemAt(index);
 	}
 	
 	/**
