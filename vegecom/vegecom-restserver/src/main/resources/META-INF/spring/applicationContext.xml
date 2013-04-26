@@ -39,6 +39,6 @@
 	</bean>    
 
     <bean id="securityFilterBean" 
-    		class="com.veisite.vegecom.rest.security.filter.ShiroSecurityFilter"/>
+    		class="com.veisite.vegecom.rest.security.filter.RestShiroSecurityFilter"/>
     
 </beans>

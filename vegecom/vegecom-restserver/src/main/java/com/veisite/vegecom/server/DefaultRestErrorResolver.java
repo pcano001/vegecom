@@ -157,6 +157,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 			resolveTransactionException((TransactionException)ex,err,locale);
 		if (ex instanceof IOException) 
 			resolveIOException((IOException)ex,err,locale);
+		resolveUnhandledException(ex,err,locale);
 	}
 
 	private void resolveDataAccessException(DataAccessException ex, RestError err, Locale locale) {
@@ -262,8 +263,17 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 		err.setDebugMessages(getDebugMessage(ex1));
 	}
 	
-	
-	
+	private void resolveUnhandledException(Throwable ex, RestError err,Locale locale) {
+		err.setCode(RestErrorCode.UNKNOW.getValue());
+		Throwable ex1 = ex.getCause()==null? ex : ex.getCause();
+		String m = getMessage(RestErrorCode.UNKNOW.getMessageKey(), null, 
+								ex.getMessage(),locale);
+		err.setExceptionClass(ex1.getClass().getSimpleName());
+		err.setMessage(m);
+		err.setDetailedMessages(new String[] {ex1.getMessage()});
+		err.setDebugMessages(getDebugMessage(ex1));
+	}
+
 	private class RestErrorTemplate extends RestError {
 		public RestErrorTemplate() {
 			super();

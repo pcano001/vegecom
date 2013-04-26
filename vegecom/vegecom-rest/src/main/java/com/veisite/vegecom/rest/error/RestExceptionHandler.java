@@ -23,14 +23,14 @@ public class RestExceptionHandler extends AbstractHandlerExceptionResolver {
 	@Override
 	protected ModelAndView doResolveException(HttpServletRequest request,
 			HttpServletResponse response, Object handler, Exception ex) {
-		logger.debug("Resolving exception {}",ex.getMessage());
+		logger.debug("doResolveException, message: '{}'",ex.getMessage());
 		RestError err = errorResolver.resolve(ex,request.getLocale());
 		response.setStatus(err.getStatus().value());
 		response.setContentType("application/json");
 		try {
 			serializationService.write(response.getOutputStream(), err);
 		} catch (IOException e) {
-			logger.error("Unexpected IO error handing exception",e);
+			logger.error("Unexpected IO error handling exception",e);
 		}
 		return null;
 	}

@@ -40,4 +40,15 @@ public class ErrorHandlerController {
 		throw new RestInvalidApiPathException("Resource api path invalid");	
 	}
 
+	@RequestMapping(value="/restServerError")
+	public @ResponseBody void restServerError(HttpServletRequest request, HttpServletResponse response) throws RestException {
+		Throwable throwable = (Throwable) request.getAttribute("javax.servlet.error.exception");
+		if (throwable!=null) {
+			if (throwable instanceof RestServerException) throw (RestServerException)throwable;
+			if (throwable instanceof RestException) throw (RestException)throwable;
+			throw new RestServerException(throwable);
+		}
+		throw new RestServerException(new Exception("ErrorHandlerController: unexpected servlet exception is null"));
+	}
+
 }

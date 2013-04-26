@@ -1,6 +1,8 @@
 package com.veisite.vegecom.rest.security.filter;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 import javax.servlet.FilterChain;
@@ -21,12 +23,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.veisite.vegecom.rest.RestServerException;
 import com.veisite.vegecom.rest.security.RestExpiredSessionException;
 import com.veisite.vegecom.rest.security.RestInvalidSessionException;
 import com.veisite.vegecom.rest.security.RestSecurity;
 import com.veisite.vegecom.rest.security.RestSecurityException;
 import com.veisite.vegecom.rest.security.RestUnauthenticatedException;
-import com.veisite.vegecom.rest.security.SecureRequestValidator;
+import com.veisite.vegecom.rest.security.RestRequestParser;
 
 /**
  * Filtro de seguridad que analiza los parámetros de entrada y
@@ -48,7 +51,7 @@ import com.veisite.vegecom.rest.security.SecureRequestValidator;
  * @author josemaria
  *
  */
-public class ShiroSecurityFilter extends OncePerRequestFilter {
+public class RestShiroSecurityFilter extends OncePerRequestFilter {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -71,13 +74,15 @@ public class ShiroSecurityFilter extends OncePerRequestFilter {
 			HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		
+		logger.debug("Checking new request: {}",request.getContextPath());
 		// Registramos la hora del servidor en segundos
 		Long ms = new Date().getTime();
 		Long sTimeStamp = Math.round(((double)ms) / 1000.0d);
 		
 		// Analizamos la petición en busca de los parámetros
-		SecureRequestValidator validator = new SecureRequestValidator(request);
-		if (!validator.isFormalyValidSecureRequest()) {
+		RestRequestParser parser = new RestRequestParser(request);
+		if (parser.getApiKey()==null || parser.getTimestamp()==null || 
+				parser.getSignature()==null || parser.getStringToBeSigned()==null) {
 			logger.debug("Invalid request security format.");
 			riseSecurityError(new RestUnauthenticatedException("Invalid security information on request"),
 					request, response, filterChain);
@@ -87,7 +92,7 @@ public class ShiroSecurityFilter extends OncePerRequestFilter {
 		// Request formally correct, analize session
 		logger.debug("Request is a formaly valid secure request. " +
 					"apiKey={}, timestamp={}",
-					validator.getApiKey(),validator.getTimestamp());
+					parser.getApiKey(),parser.getTimestamp());
 			
 		Session session = null;
 		RestSecurityException sError = null;
@@ -95,7 +100,7 @@ public class ShiroSecurityFilter extends OncePerRequestFilter {
 		Long delta = null;
 		String user = null;
 		try {
-			DefaultSessionKey sk = new DefaultSessionKey(validator.getApiKey());
+			DefaultSessionKey sk = new DefaultSessionKey(parser.getApiKey());
 			session = SecurityUtils.getSecurityManager().getSession(sk);
 			secret = (String) session.getAttribute(RestSecurity.SECRETSESSION_KEY);
 			delta = (Long) session.getAttribute(RestSecurity.DELTATIME_KEY);
@@ -111,18 +116,27 @@ public class ShiroSecurityFilter extends OncePerRequestFilter {
 			return;
 		}
 
-		// We have a valid session. Test a valid signature 
-		if (!validator.isCorrectlySigned(secret)) {
-			logger.debug("Invalid security request: sign missmatch.");
-			riseSecurityError(new RestUnauthenticatedException("Invalid security information on request. Sign missmatch"), 
+		// We have a valid session. Test a valid timestamp
+		Long timeDistance = Math.abs(sTimeStamp-parser.getTimestamp()-delta);
+		if (timeDistance > maxDelta) {
+			// timestamp is not in range
+			logger.debug("Invalid security request: timestamp distance {} is not in range.",timeDistance);
+			riseSecurityError(new RestUnauthenticatedException("Invalid security information on request. Invalid timestamp"), 
 					request, response, filterChain);
 			return;
 		}
-		// Test a valid timestamp
-		if (Math.abs(sTimeStamp-validator.getTimestamp()-delta) > maxDelta) {
-			// timestamp is not in range
-			logger.debug("Invalid security request: timestamp is not in range.");
-			riseSecurityError(new RestUnauthenticatedException("Invalid security information on request. Invalid timestamp"), 
+		// Now test a valid signature
+		String sign = null;
+		try {
+			sign = RestSecurity.getSignature(parser.getStringToBeSigned(), secret);
+		} catch (InvalidKeyException e) {
+			throw new RestServerException("Server error getting signature from query.");
+		} catch (NoSuchAlgorithmException e) {
+			throw new RestServerException("Server error getting signature from query.");
+		}
+		if (!parser.getSignature().equals(sign)) {
+			logger.debug("Invalid security request: sign missmatch.");
+			riseSecurityError(new RestUnauthenticatedException("Invalid security information on request. Sign missmatch"), 
 					request, response, filterChain);
 			return;
 		}
@@ -132,7 +146,7 @@ public class ShiroSecurityFilter extends OncePerRequestFilter {
 		subjectContext.setPrincipals(new SimplePrincipalCollection(user,"default"));
 		subjectContext.setAuthenticated(true);
 		subjectContext.setSecurityManager(SecurityUtils.getSecurityManager());
-		subjectContext.setSessionId(validator.getApiKey());
+		subjectContext.setSessionId(parser.getApiKey());
 		subjectContext.setSession(session);
 		subjectContext.setSessionCreationEnabled(false);
 		
