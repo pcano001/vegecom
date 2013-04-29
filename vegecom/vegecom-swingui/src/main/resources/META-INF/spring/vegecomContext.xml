@@ -13,17 +13,54 @@
 		</property>
 	</bean>
 	
-	<!-- El Bean apunta a un archivo de propiedades donde meteremos todas las propiedades
-		que necesitemos en el proyecto. Por código se accede a estas propiedades a través
-		de: Application.getApplicationProperties().getPROPIEDAD();
-	 -->
-	 <!-- 
-	<bean id="clientConfiguration" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
-		<property name="basename">
-		<value>${server.baseurl}/resources/vegecom</value>
+    <bean id="serializationService" class="com.veisite.vegecom.service.impl.JsonSerializationService">
+    </bean>
+    
+    <bean id="securityService" class="com.veisite.vegecom.service.impl.RestSecurityServiceImpl"/>
+    
+    <bean id="restContext" class="com.veisite.vegecom.rest.client.DefaultRestClientContext">
+    	<property name="scheme" value="https"/>
+    	<property name="host" value="localhost"/>
+    	<property name="port" value="8443"/>
+    	<property name="apiPath" value=""/>
+    	<property name="restSecurityService" ref="securityService"/> 
+    </bean>
+    <bean id="requestFactory" class="com.veisite.vegecom.rest.client.DefaultRestClientRequestFactory">
+    	<property name="context" ref="restContext"/>
+    </bean>
+    <bean id="daoExceptionHandler" class="com.veisite.vegecom.rest.client.dao.DAOExceptionHandler">
+    	<property name="messageSource" ref="messageSource"/>
+    	<property name="serializationService" ref="serializationService"/>
+    </bean>
+    
+    <bean id="restSessionDAO" class="com.veisite.vegecom.rest.client.dao.DefaultRestSessionDAO">
+    	<property name="resourcePath" value="/apiKey"/>
+    	<property name="serializationService" ref="serializationService"/>
+    	<property name="requestFactory" ref="requestFactory"/>
+    	<property name="exceptionHandler" ref="daoExceptionHandler"/>
+    </bean>
+    
+    <!--
+        Security with Apache Shiro
+    -->
+    <bean id="securityManager" class="com.veisite.vegecom.rest.client.RestShiroSecurityManager">
+		<property name="authenticator">
+			<bean class="com.veisite.vegecom.rest.client.RestShiroAuthenticator">
+				<property name="sessionDAO" ref="restSessionDAO"/>
+			</bean>
 		</property>
-	</bean>
-	 -->
+    </bean>
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+	<!-- For simplest integration, so that all SecurityUtils.* methods work in all cases, -->
+	<!-- make the securityManager bean a static singleton. DO NOT do this in web -->
+	<!-- applications - see the 'Web Applications' section below instead. -->
+	<bean
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="staticMethod"
+			value="org.apache.shiro.SecurityUtils.setSecurityManager" />
+		<property name="arguments" ref="securityManager" />
+	</bean>    
+
 
     <!--
         This declaration will cause Spring to locate every @Component,
@@ -49,5 +86,6 @@
 	<context:component-scan base-package="com.veisite.vegecom"/>
 
     <context:annotation-config />
-
+    
+    
 </beans>

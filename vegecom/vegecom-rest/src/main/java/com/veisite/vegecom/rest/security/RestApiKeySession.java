@@ -6,6 +6,9 @@ public class RestApiKeySession {
 	
 	private String secret;
 
+	public RestApiKeySession() {
+	}
+	
 	public RestApiKeySession(String apiKey, String secret) {
 		this.setApiKey(apiKey);
 		this.setSecret(secret);

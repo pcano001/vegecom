@@ -1,8 +1,8 @@
 package com.veisite.vegecom.rest.security;
 
-import com.veisite.vegecom.rest.RestClientException;
+import com.veisite.vegecom.rest.ClientRestException;
 
-public abstract class RestSecurityException extends RestClientException {
+public abstract class RestSecurityException extends ClientRestException {
 
 	/**
 	 * serial

@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.veisite.vegecom.model.Cliente;
-import com.veisite.vegecom.rest.RestClientException;
+import com.veisite.vegecom.rest.ClientRestException;
 import com.veisite.vegecom.rest.RestException;
-import com.veisite.vegecom.rest.RestServerException;
+import com.veisite.vegecom.rest.ServerRestException;
 import com.veisite.vegecom.service.ClienteService;
 import com.veisite.vegecom.service.SerializationMappingException;
 import com.veisite.vegecom.service.SerializationParseException;
@@ -52,7 +52,7 @@ public class ClienteController extends DefaultController {
 			fillResponseHeader(response, serializationService.getContentType());
 			serializationService.writeList(response.getOutputStream(), l);
 		} catch (Throwable t) {
-			throw new RestServerException(t);
+			throw new ServerRestException(t);
 		}
 		logger.debug("Requesting cliente list returned successfully.");
 	}
@@ -69,13 +69,13 @@ public class ClienteController extends DefaultController {
 				serializationService.write(response.getOutputStream(), o);
 			} else {
 				logger.debug("Cliente {} not found.",id);
-				throw new RestClientException( 
+				throw new ClientRestException( 
 						new DataRetrievalFailureException("Cliente with id="+id+" not found"));
 			}
 		} catch (RestException re) {
 			throw re;
 		} catch (Throwable t) {
-			throw new RestServerException(t);
+			throw new ServerRestException(t);
 		}
 		logger.debug("Requesting cliente returned successfully.");
 	}
@@ -88,21 +88,21 @@ public class ClienteController extends DefaultController {
 		try {
 			o = serializationService.read(request.getInputStream(), Cliente.class);
 		} catch (SerializationParseException spe) {
-			throw new RestClientException(spe);
+			throw new ClientRestException(spe);
 		} catch (SerializationMappingException me) {
-			throw new RestClientException(me);
+			throw new ClientRestException(me);
 		} catch (Throwable t) {
-			throw new RestServerException(t);
+			throw new ServerRestException(t);
 		}
 		if (o==null) {
 			logger.error("create. Deserialization: can not get a valid cliente from request body. Null");
-			throw new RestClientException(
+			throw new ClientRestException(
 				new InvalidDataAccessApiUsageException("parameter Cliente is null. Cannot create"));
 		}
 		if (o.getId()!=null) {
 			// Se quiere crear un cliente pero ya trae un id. Error
 			logger.debug("create. Cliente error: cliente Id for new cliente must be null.");
-			throw new RestClientException(
+			throw new ClientRestException(
 				new InvalidDataAccessApiUsageException("new Cliente Id is not null. Cannot create"));
 		}
 		try {
@@ -112,7 +112,7 @@ public class ClienteController extends DefaultController {
 			fillResponseHeader(response, serializationService.getContentType());
 			serializationService.write(response.getOutputStream(), o);
 		} catch (Throwable t) {
-			throw new RestServerException(t);
+			throw new ServerRestException(t);
 		}
 		logger.debug("create Cliente: new cliente returned successfully.");
 	}
@@ -125,21 +125,21 @@ public class ClienteController extends DefaultController {
 		try {
 			o = serializationService.read(request.getInputStream(), Cliente.class);
 		} catch (SerializationParseException spe) {
-			throw new RestClientException(spe);
+			throw new ClientRestException(spe);
 		} catch (SerializationMappingException me) {
-			throw new RestClientException(me);
+			throw new ClientRestException(me);
 		} catch (Throwable t) {
-			throw new RestServerException(t);
+			throw new ServerRestException(t);
 		}
 		if (o==null) {
 			logger.error("update. Deserialization: can not get a valid cliente from request body. Null");
-			throw new RestClientException(
+			throw new ClientRestException(
 				new InvalidDataAccessApiUsageException("parameter Cliente is null. Cannot update"));
 		}
 		if (!id.equals(o.getId())) {
 			// El id del cliente a actualizar es distinto del recurso accedido
 			logger.debug("update. cliente Id mismatch resource id.");
-			throw new RestClientException(
+			throw new ClientRestException(
 				new InvalidDataAccessApiUsageException("Cliente Id mismatch resource Id. Cannot update"));
 		}
 		try {
@@ -149,7 +149,7 @@ public class ClienteController extends DefaultController {
 			fillResponseHeader(response, serializationService.getContentType());
 			serializationService.write(response.getOutputStream(), o);
 		} catch (Throwable t) {
-			throw new RestServerException(t);
+			throw new ServerRestException(t);
 		}
 		logger.debug("update Cliente: updated cliente returned successfully.");
 	}
@@ -162,7 +162,7 @@ public class ClienteController extends DefaultController {
 		try {
 			// Borrar el cliente
 			o = dataService.remove(id);
-			if (o==null) throw new RestClientException(
+			if (o==null) throw new ClientRestException(
 					new DataRetrievalFailureException("delete Cliente: not found"));
 			// Se devuelve en la respuesta el cliente borrado.
 			fillResponseHeader(response, serializationService.getContentType());
@@ -170,7 +170,7 @@ public class ClienteController extends DefaultController {
 		} catch (RestException re) {
 			throw re;
 		} catch (Throwable t) {
-			throw new RestServerException(t);
+			throw new ServerRestException(t);
 		}
 		logger.debug("delete Cliente: deleted cliente returned successfully.");
 	}

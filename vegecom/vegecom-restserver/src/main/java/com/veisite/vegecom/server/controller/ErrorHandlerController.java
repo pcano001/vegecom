@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.veisite.vegecom.rest.RestException;
 import com.veisite.vegecom.rest.RestInvalidApiPathException;
-import com.veisite.vegecom.rest.RestServerException;
+import com.veisite.vegecom.rest.ServerRestException;
 import com.veisite.vegecom.rest.security.RestSecurityException;
 
 @Controller
@@ -29,9 +29,9 @@ public class ErrorHandlerController {
 		if (throwable!=null) {
 			if (throwable instanceof RestSecurityException) throw (RestSecurityException)throwable;
 			if (throwable instanceof RestException) throw (RestException)throwable;
-			throw new RestServerException(throwable);
+			throw new ServerRestException(throwable);
 		}
-		throw new RestServerException(new Exception("ErrorHandlerController: unexpected servlet exception is null"));
+		throw new ServerRestException(new Exception("ErrorHandlerController: unexpected servlet exception is null"));
 	}
 
 	
@@ -44,11 +44,11 @@ public class ErrorHandlerController {
 	public @ResponseBody void restServerError(HttpServletRequest request, HttpServletResponse response) throws RestException {
 		Throwable throwable = (Throwable) request.getAttribute("javax.servlet.error.exception");
 		if (throwable!=null) {
-			if (throwable instanceof RestServerException) throw (RestServerException)throwable;
+			if (throwable instanceof ServerRestException) throw (ServerRestException)throwable;
 			if (throwable instanceof RestException) throw (RestException)throwable;
-			throw new RestServerException(throwable);
+			throw new ServerRestException(throwable);
 		}
-		throw new RestServerException(new Exception("ErrorHandlerController: unexpected servlet exception is null"));
+		throw new ServerRestException(new Exception("ErrorHandlerController: unexpected servlet exception is null"));
 	}
 
 }

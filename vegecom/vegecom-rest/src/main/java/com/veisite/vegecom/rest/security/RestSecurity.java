@@ -11,8 +11,12 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.shiro.codec.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class RestSecurity {
+	
+	private static Logger logger = LoggerFactory.getLogger(RestSecurity.class);
 	
 	/**
 	 * parameter string on request query
@@ -26,6 +30,7 @@ public abstract class RestSecurity {
 	/**
 	 * key string for attribute on session
 	 */
+	public static final String APIKEY_KEY = "apiKeyKey";
 	public static final String PRINCIPAL_KEY = "principalKey";
 	public static final String SECRETSESSION_KEY = "secretApiKey";
 	public static final String DELTATIME_KEY = "serverTimeDelta";
@@ -73,11 +78,12 @@ public abstract class RestSecurity {
 	 */
 	public static String getSignature(String message, String secretKey) 
 			throws NoSuchAlgorithmException, InvalidKeyException {
+		logger.debug("Requesting signature for digest: \"{}\"",message);
 		SecretKey key = new SecretKeySpec(Base64.decode(secretKey.getBytes()), macAlgorithm);
-		 Mac mac = Mac.getInstance(macAlgorithm);
-         mac.init(key);
-         byte[] hmacData = mac.doFinal(message.getBytes());
-		return Base64.encodeToString(hmacData);
+		Mac mac = Mac.getInstance(macAlgorithm);
+        mac.init(key);
+        byte[] hmacData = mac.doFinal(message.getBytes());
+        return Base64.encodeToString(hmacData);
 	}
 	
 	public static String generateApiKeyToken(String seed) {

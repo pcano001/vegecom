@@ -33,6 +33,8 @@ public abstract class AbstractListTableModel<T> extends AbstractTableModel
 	
 	private boolean loadingData=false;
 	
+	private boolean neverRefreshed=true;
+	
 	/**
 	 * Indica si los datos modelo son exportables (ODS,XLS,etc)
 	 * para uso de otras clases.
@@ -183,6 +185,13 @@ public abstract class AbstractListTableModel<T> extends AbstractTableModel
 	}
 	
 	/**
+	 * @return the neverRefreshed
+	 */
+	public boolean isNeverRefreshed() {
+		return neverRefreshed;
+	}
+
+	/**
 	 * Devuelve la lista que se usa en el modelo para la 
 	 * visualizacion.
 	 */
@@ -297,6 +306,7 @@ public abstract class AbstractListTableModel<T> extends AbstractTableModel
 	 * 
 	 */
 	private synchronized void fireDataLoadEnd() {
+		neverRefreshed = false;
 		Iterator<DataLoadListener> i = _listeners.iterator();
 		while (i.hasNext()) {
 			((DataLoadListener) i.next()).dataLoadEnd();

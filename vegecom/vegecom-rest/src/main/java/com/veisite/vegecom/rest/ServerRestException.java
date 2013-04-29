@@ -1,28 +1,28 @@
 package com.veisite.vegecom.rest;
 
-public class RestServerException extends RestException {
+public class ServerRestException extends RestException {
 
 	/**
 	 * serial
 	 */
 	private static final long serialVersionUID = -116245264421623338L;
 
-	public RestServerException() {
+	public ServerRestException() {
 	}
 
-	public RestServerException(String message) {
+	public ServerRestException(String message) {
 		super(message);
 	}
 
-	public RestServerException(Throwable cause) {
+	public ServerRestException(Throwable cause) {
 		super(cause);
 	}
 
-	public RestServerException(String message, Throwable cause) {
+	public ServerRestException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public RestServerException(String message, Throwable cause,
+	public ServerRestException(String message, Throwable cause,
 			boolean enableSuppression, boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 	}

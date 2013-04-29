@@ -39,6 +39,11 @@
     	<version>${spring.version}</version>
     </dependency>
     <dependency>
+    	<groupId>org.springframework</groupId>
+    	<artifactId>spring-tx</artifactId>
+    	<version>${spring.version}</version>
+    </dependency>
+    <dependency>
     	<groupId>javax.servlet</groupId>
     	<artifactId>javax.servlet-api</artifactId>
     	<version>3.0.1</version>
@@ -49,10 +54,20 @@
     	<artifactId>veisite-utils</artifactId>
     	<version>${project.parent.version}</version>
     </dependency>
+    <dependency>
+    	<groupId>com.veisite.vegecom</groupId>
+    	<artifactId>vegecom-service</artifactId>
+    	<version>${project.parent.version}</version>
+    </dependency>
 	<dependency>
 		<groupId>org.apache.shiro</groupId>
 		<artifactId>shiro-core</artifactId>
 		<version>1.2.1</version>
 	</dependency>
+    <dependency>
+    	<groupId>org.apache.httpcomponents</groupId>
+    	<artifactId>httpclient</artifactId>
+    	<version>4.2.3</version>
+    </dependency>
   </dependencies>
 </project>

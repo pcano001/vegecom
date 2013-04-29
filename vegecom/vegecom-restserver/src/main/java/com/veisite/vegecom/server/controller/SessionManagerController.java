@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.veisite.vegecom.rest.RestClientException;
+import com.veisite.vegecom.rest.ClientRestException;
 import com.veisite.vegecom.rest.RestException;
-import com.veisite.vegecom.rest.RestServerException;
+import com.veisite.vegecom.rest.ServerRestException;
 import com.veisite.vegecom.rest.security.RestApiKeySession;
 import com.veisite.vegecom.rest.security.RestSecurity;
 import com.veisite.vegecom.rest.security.RestUnauthorizedException;
@@ -52,7 +52,7 @@ public class SessionManagerController extends DefaultController {
 		logger.debug("Requesting new apiKey creation");
 		// Comprobamos que la petición viene por un canal seguro.
 		if (!request.isSecure()) {
-			throw new RestClientException(
+			throw new ClientRestException(
 				new InvalidDataAccessApiUsageException("New api keys must be requested in an SSL channel."));
 		}
 		// Tomemos el timestamp del servidor
@@ -73,11 +73,11 @@ public class SessionManagerController extends DefaultController {
 		}
 		
 		if (user==null || password==null) {
-			throw new RestClientException(
+			throw new ClientRestException(
 				new InvalidDataAccessApiUsageException("Invalid user or password"));
 		}
 		if (cTimestamp==null) {
-			throw new RestClientException(
+			throw new ClientRestException(
 				new InvalidDataAccessApiUsageException("A valid TimeStamp from client is required."));
 		}
 		Long delta = sTimestamp-cTimestamp;
@@ -93,7 +93,7 @@ public class SessionManagerController extends DefaultController {
 	    try {
 			secret = RestSecurity.generateSecretKey(user);
 	    } catch (NoSuchAlgorithmException e) {
-			throw new RestServerException(e);
+			throw new ServerRestException(e);
 		}
 	    DefaultSessionContext sContext = new DefaultSessionContext();
 	    sContext.setHost(request.getRemoteAddr());
@@ -102,7 +102,8 @@ public class SessionManagerController extends DefaultController {
 	    session.setAttribute(RestSecurity.PRINCIPAL_KEY, user);
 	    session.setAttribute(RestSecurity.SECRETSESSION_KEY, secret);
 	    session.setAttribute(RestSecurity.DELTATIME_KEY, delta);
-	    logger.info("Started new session '{}' for user '{}'",token,user);
+	    String m = "Started new session '"+token+"' for user '"+user+"' with delta "+delta+"s.";
+	    logger.info(m);
 	    
 	    // Crear token de sesion de vuelta al cliente
 	    RestApiKeySession sObject = new RestApiKeySession(token,secret);
@@ -110,7 +111,7 @@ public class SessionManagerController extends DefaultController {
 	    	fillResponseHeader(response, serializationService.getContentType());
 			serializationService.write(response.getOutputStream(), sObject);
 		} catch (Throwable t) {
-			throw new RestServerException(t);
+			throw new ServerRestException(t);
 		}
 		logger.debug("apiKey session returned successfully");
 	}

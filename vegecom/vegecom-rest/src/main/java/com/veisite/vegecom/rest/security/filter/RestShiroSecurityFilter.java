@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.veisite.vegecom.rest.RestServerException;
+import com.veisite.vegecom.rest.ServerRestException;
 import com.veisite.vegecom.rest.security.RestExpiredSessionException;
 import com.veisite.vegecom.rest.security.RestInvalidSessionException;
 import com.veisite.vegecom.rest.security.RestSecurity;
@@ -130,9 +130,9 @@ public class RestShiroSecurityFilter extends OncePerRequestFilter {
 		try {
 			sign = RestSecurity.getSignature(parser.getStringToBeSigned(), secret);
 		} catch (InvalidKeyException e) {
-			throw new RestServerException("Server error getting signature from query.");
+			throw new ServerRestException("Server error getting signature from query.");
 		} catch (NoSuchAlgorithmException e) {
-			throw new RestServerException("Server error getting signature from query.");
+			throw new ServerRestException("Server error getting signature from query.");
 		}
 		if (!parser.getSignature().equals(sign)) {
 			logger.debug("Invalid security request: sign missmatch.");
@@ -152,6 +152,7 @@ public class RestShiroSecurityFilter extends OncePerRequestFilter {
 		
 		Subject subject = SecurityUtils.getSecurityManager().createSubject(subjectContext);
 		ThreadContext.bind(subject);
+		session.touch();
 		
 		filterChain.doFilter(request, response);
 	}

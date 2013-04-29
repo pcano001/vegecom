@@ -212,7 +212,6 @@ public class ClienteUIServiceImpl extends UIFrameworkAbstractService
 		if (listModel == null) {
 			ClienteListProvider dataProvider = new ClienteListProvider(dataService);
 			listModel = new TerceroListTableModel<Cliente>(dataProvider, this);
-			listModel.refreshData();
 		}
 		return this.listModel;
 	}

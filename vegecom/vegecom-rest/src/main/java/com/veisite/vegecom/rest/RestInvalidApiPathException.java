@@ -1,6 +1,6 @@
 package com.veisite.vegecom.rest;
 
-public class RestInvalidApiPathException extends RestClientException {
+public class RestInvalidApiPathException extends ClientRestException {
 
 	/**
 	 * serial

@@ -43,7 +43,7 @@ public class RestRequestParser {
 		while (en.hasMoreElements()) {
 			String pa = en.nextElement();
 			if (!pa.equals(RestSecurity.SIGNATURE_PARAMETER)) 
-				pMap.put(new String(pa), pa);
+				pMap.put(new String(pa).toLowerCase(), pa);
 			else this.signature = request.getParameter(RestSecurity.SIGNATURE_PARAMETER);
 			if (pa.equals(RestSecurity.APIKEY_PARAMETER)) 
 				this.apiKey = request.getParameter(RestSecurity.APIKEY_PARAMETER);
@@ -63,16 +63,14 @@ public class RestRequestParser {
 		 * Construct the query again to obtain string to be signed
 		 */
 		List<String> pl = new ArrayList<String>();
-		for (String p : pMap.keySet()) {
-			pl.add(p.toLowerCase());
-		}
+		for (String p : pMap.keySet()) pl.add(p);
 		Collections.sort(pl);
 		String toSigned = request.getRequestURI();
 		for (int i=0;i<pl.size();i++) { 
 			toSigned += (i==0? "?" : "&");
 			String parameter = pMap.get(pl.get(i));
 			String value = request.getParameter(parameter);
-			toSigned += parameter+"="+value;
+			toSigned += pl.get(i)+"="+value;
 		}
 		this.stringToBeSigned = toSigned; 
 	}

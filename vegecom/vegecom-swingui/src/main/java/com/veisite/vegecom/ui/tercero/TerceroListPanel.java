@@ -92,6 +92,7 @@ public abstract class TerceroListPanel<T extends TerceroComercial> extends UIFra
 		add(tablePanel,BorderLayout.CENTER);
 		configureFilter();
 		initSortOrder();
+		if (dataModel.isNeverRefreshed()) dataModel.refreshData();
 	}
 
 	/**

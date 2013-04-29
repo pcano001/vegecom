@@ -1,10 +1,9 @@
-package com.veisite.vegecom.service.impl.dao;
+package com.veisite.vegecom.rest.client.dao;
 
 import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.DataAccessException;
@@ -29,8 +28,16 @@ import com.veisite.vegecom.service.SerializationService;
 public class DAOExceptionHandler {
 	
 	private Logger logger = LoggerFactory.getLogger(getClass());
-
-	@Autowired
+	
+	private static final String RESOURCEACCESSEXCEPTION_KEY = "dao.error.ResourceAccessException";
+	private static final String UNKNOWNDATAACCESSEXCEPTION_KEY = "dao.error.UnknownDataAccessException";
+	private static final String UNEXPECTEDCLIENTRESPONSEFORMAT_KEY = "dao.error.UnexpectedResponseFormatClientException";
+	private static final String UNEXPECTEDSERVERRESPONSEFORMAT_KEY = "dao.error.UnexpectedResponseFormatServerException";
+	private static final String SERVERERROREXCEPTION_KEY = "dao.error.ServerErrorExceptionMessage";
+	private static final String CLIENTERROREXCEPTION_KEY = "dao.error.ClientErrorExceptionMessage";
+	private static final String SIMPLESERVERERROREXCEPTION_KEY = "dao.error.SimpleServerErrorException";
+	private static final String SIMPLECLIENTERROREXCEPTION_KEY = "dao.error.SimpleClientErrorException";
+	
 	private SerializationService serializationService;
 
 	private MessageSource messageSource = null;
@@ -42,7 +49,7 @@ public class DAOExceptionHandler {
 		if (exception instanceof ResourceAccessException) {
 			message = "Error conecting to server";
 			if (messageSource!=null)
-				message = messageSource.getMessage("dao.error.ResourceAccessException", null, message, Locale.getDefault());
+				message = messageSource.getMessage(RESOURCEACCESSEXCEPTION_KEY, null, message, Locale.getDefault());
 			return new DataAccessResourceFailureException(message,exception);
 		}
 		if (exception instanceof HttpStatusCodeException) {
@@ -53,7 +60,7 @@ public class DAOExceptionHandler {
 		}
 		message = "Error requesting to server"; 
 		if (messageSource!=null)
-			message = messageSource.getMessage("dao.error.UnknownDataAccessException", null, message, Locale.getDefault());
+			message = messageSource.getMessage(UNKNOWNDATAACCESSEXCEPTION_KEY, null, message, Locale.getDefault());
 		return new DataAccessResourceFailureException(message, exception);
 	}
 
@@ -74,12 +81,12 @@ public class DAOExceptionHandler {
 			if (exception instanceof HttpClientErrorException) {
 				message = "Internal error. Incorret request path to server or incorrect server api use.";
 				if (messageSource!=null)
-					message = messageSource.getMessage("dao.error.UnexpectedResponseFormatClientException", 
+					message = messageSource.getMessage(UNEXPECTEDCLIENTRESPONSEFORMAT_KEY, 
 							null, message, Locale.getDefault());
 			} else {
 				message = "Internal error. Server reports an error with unexpected format.";
 				if (messageSource!=null)
-					message = messageSource.getMessage("dao.error.UnexpectedResponseFormatServerException", 
+					message = messageSource.getMessage(UNEXPECTEDSERVERRESPONSEFORMAT_KEY, 
 							null, message, Locale.getDefault());
 			}
 			return new InvalidDataAccessApiUsageException(message,exception);
@@ -111,13 +118,13 @@ public class DAOExceptionHandler {
 		String message = "";
 		if (exception.getStatusCode().series()==HttpStatus.Series.SERVER_ERROR) {
 			message = "The server has reported an internal error";
-			message = messageSource.getMessage("dao.error.ServerErrorExceptionMessage", 
+			message = messageSource.getMessage(SERVERERROREXCEPTION_KEY, 
 					null, message, Locale.getDefault());
 			message += "\n";
 		}
 		if (exception.getStatusCode().series()==HttpStatus.Series.SERVER_ERROR) {
 			message = "The server has reported an error processing the request";
-			message = messageSource.getMessage("dao.error.ClientErrorExceptionMessage", 
+			message = messageSource.getMessage(CLIENTERROREXCEPTION_KEY, 
 					null, message, Locale.getDefault());
 			message += "\n";
 		}
@@ -153,13 +160,13 @@ public class DAOExceptionHandler {
 		if (code.series()==HttpStatus.Series.SERVER_ERROR) {
 			message = "Server error. Status code {}-{}.";
 			if (messageSource!=null)
-				message = messageSource.getMessage("dao.error.SimpleServerErrorException", 
+				message = messageSource.getMessage(SIMPLESERVERERROREXCEPTION_KEY, 
 					new Object[] {code.value(), code.getReasonPhrase()}, message, Locale.getDefault());
 				return new UnexpectedRestErrorException(message,exception);
 		}
 		message = "Server reports an error in client request. Status code {}-{}.";
 		if (messageSource!=null)
-			message = messageSource.getMessage("dao.error.SimpleClientErrorException", 
+			message = messageSource.getMessage(SIMPLECLIENTERROREXCEPTION_KEY, 
 				new Object[] {code.value(), code.getReasonPhrase()}, message, Locale.getDefault());
 		return new UnexpectedRestErrorException(message,exception);
 	}
@@ -170,5 +177,19 @@ public class DAOExceptionHandler {
 
 	public void setMessageSource(MessageSource messageSource) {
 		this.messageSource = messageSource;
+	}
+
+	/**
+	 * @return the serializationService
+	 */
+	public SerializationService getSerializationService() {
+		return serializationService;
+	}
+
+	/**
+	 * @param serializationService the serializationService to set
+	 */
+	public void setSerializationService(SerializationService serializationService) {
+		this.serializationService = serializationService;
 	}
 }

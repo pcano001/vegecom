@@ -21,10 +21,10 @@ import org.springframework.transaction.TransactionException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.veisite.vegecom.rest.RestClientException;
+import com.veisite.vegecom.rest.ClientRestException;
 import com.veisite.vegecom.rest.RestException;
 import com.veisite.vegecom.rest.RestInvalidApiPathException;
-import com.veisite.vegecom.rest.RestServerException;
+import com.veisite.vegecom.rest.ServerRestException;
 import com.veisite.vegecom.rest.error.RestError;
 import com.veisite.vegecom.rest.error.RestErrorCode;
 import com.veisite.vegecom.rest.error.RestErrorResolver;
@@ -96,14 +96,14 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 	}
 	
 	private RestError resolveRestException(RestException re, Locale locale) {
-		if (re instanceof RestClientException)
-			return resolveRestClientException((RestClientException) re, locale);
-		if (re instanceof RestServerException)
-			return resolveRestServerException((RestServerException) re, locale);
+		if (re instanceof ClientRestException)
+			return resolveRestClientException((ClientRestException) re, locale);
+		if (re instanceof ServerRestException)
+			return resolveRestServerException((ServerRestException) re, locale);
 		return null;
 	}
 	
-	private RestError resolveRestClientException(RestClientException rce, Locale locale) {
+	private RestError resolveRestClientException(ClientRestException rce, Locale locale) {
 		if (rce instanceof RestSecurityException) 
 			return resolveRestSecurityException((RestSecurityException)rce, locale);
 		if (rce instanceof RestInvalidApiPathException) 
@@ -115,7 +115,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 		return err;
 	}
 
-	private RestError resolveRestServerException(RestServerException rce, Locale locale) {
+	private RestError resolveRestServerException(ServerRestException rce, Locale locale) {
 		RestError err = new RestErrorTemplate();
 		resolveInternalException(rce.getCause(), err, locale);
 		if (err.getCode() == 0) err.setCode(RestErrorCode.INTERNAL_SERVER_ERROR.getValue());

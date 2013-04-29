@@ -1,4 +1,4 @@
-package com.veisite.vegecom.service.impl.dao;
+package com.veisite.vegecom.rest.client.dao;
 
 import org.springframework.dao.UncategorizedDataAccessException;
 

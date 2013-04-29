@@ -4,13 +4,10 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResponseExtractor;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 import com.veisite.utils.dataio.DataIOException;
 import com.veisite.utils.dataio.ObjectOutputFlow;
@@ -19,36 +16,24 @@ import com.veisite.vegecom.rest.client.ListResponseExtractor;
 import com.veisite.vegecom.rest.client.ObjectFlowResponseExtractor;
 import com.veisite.vegecom.rest.client.ObjectRequestFiller;
 import com.veisite.vegecom.rest.client.ObjectResponseExtractor;
-import com.veisite.vegecom.service.SerializationService;
-import com.veisite.vegecom.service.impl.RestClientService;
+import com.veisite.vegecom.rest.client.RestClientRequest;
 
 @Repository
-public class ClienteDAO {
+public class ClienteDAO extends AbstractRestDAO {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	
-	@Autowired
-	private RestClientService restService;
-	
-	@Autowired
-	private SerializationService serializationService;
-	
-	@Autowired
-	private DAOExceptionHandler exceptionHandler;
-	
-	private static final String ENTRYPOINT_URL = "/cliente";
+	public ClienteDAO() {
+		setResourcePath("/rs/cliente");
+	}
 	
 	public Cliente getById(Long id) {
-		RestTemplate tp = restService.createRestTemplate();
-		String url = restService.getBaseURL()+ENTRYPOINT_URL+"/{id}";
+		String path = getResourcePath()+"/"+Long.toString(id);
+		RestClientRequest request = requestFactory.createRequest(path);
 		RequestCallback cb = null;
 		ResponseExtractor<Cliente> ex = 
 				new ObjectResponseExtractor<Cliente>(serializationService, Cliente.class);
-		try {
-			return tp.execute(url, HttpMethod.GET, cb, ex, id);
-		} catch (RestClientException rce) {
-			throw exceptionHandler.getDataAccessException(rce);
-		}
+		return executeQuery(request, HttpMethod.GET, cb, ex);
 	}
 	
 	public Cliente save(Cliente cliente) {
@@ -61,44 +46,32 @@ public class ClienteDAO {
 	}
 
 	public Cliente create(Cliente cliente) {
-		RestTemplate tp = restService.createRestTemplate();
-		String url = restService.getBaseURL()+ENTRYPOINT_URL;
+		String path = getResourcePath();
+		RestClientRequest request = requestFactory.createRequest(path);
 		RequestCallback cb = 
 			new ObjectRequestFiller<Cliente>(serializationService, cliente);
 		ResponseExtractor<Cliente> ex = 
 				new ObjectResponseExtractor<Cliente>(serializationService, Cliente.class);
-		try {
-			return tp.execute(url, HttpMethod.POST, cb, ex);
-		} catch (RestClientException rce) {
-			throw exceptionHandler.getDataAccessException(rce);
-		}
+		return executeQuery(request, HttpMethod.POST, cb, ex);
 	}
 
 	public Cliente update(Cliente cliente) {
-		RestTemplate tp = restService.createRestTemplate();
-		String url = restService.getBaseURL()+ENTRYPOINT_URL+"/{id}";
+		String path = getResourcePath()+"/"+Long.toString(cliente.getId());
+		RestClientRequest request = requestFactory.createRequest(path);
 		RequestCallback cb = 
 			new ObjectRequestFiller<Cliente>(serializationService, cliente);
 		ResponseExtractor<Cliente> ex = 
 			new ObjectResponseExtractor<Cliente>(serializationService, Cliente.class);
-		try {
-			return tp.execute(url, HttpMethod.PUT, cb, ex, cliente.getId());
-		} catch (RestClientException rce) {
-			throw exceptionHandler.getDataAccessException(rce);
-		}
+		return executeQuery(request, HttpMethod.PUT, cb, ex);
 	}
 
 	public Cliente remove(Long id) {
-		RestTemplate tp = restService.createRestTemplate();
-		String url = restService.getBaseURL()+ENTRYPOINT_URL+"/{id}";
+		String path = getResourcePath()+"/"+Long.toString(id);
+		RestClientRequest request = requestFactory.createRequest(path);
 		RequestCallback cb = null;
 		ResponseExtractor<Cliente> ex = 
 			new ObjectResponseExtractor<Cliente>(serializationService, Cliente.class);
-		try {
-			return tp.execute(url, HttpMethod.DELETE, cb, ex, id);
-		} catch (RestClientException rce) {
-			throw exceptionHandler.getDataAccessException(rce);
-		}
+		return executeQuery(request, HttpMethod.DELETE, cb, ex);
 	}
 	
 	/**
@@ -107,16 +80,12 @@ public class ClienteDAO {
 	 * @return
 	 */
 	public List<Cliente> getList() {
-		RestTemplate tp = restService.createRestTemplate();
-		String url = restService.getBaseURL()+ENTRYPOINT_URL+"/list";
+		String path = getResourcePath()+"/list";
+		RestClientRequest request = requestFactory.createRequest(path);
 		RequestCallback cb = null;
 		ResponseExtractor<List<Cliente>> ex = 
 				new ListResponseExtractor<Cliente>(serializationService, Cliente.class);
-		try {
-			return tp.execute(url, HttpMethod.GET, cb, ex);
-		} catch (RestClientException rce) {
-			throw exceptionHandler.getDataAccessException(rce);
-		}
+		return executeQuery(request, HttpMethod.GET, cb, ex);
 	}
 
 	
@@ -126,17 +95,13 @@ public class ClienteDAO {
 	 * @throws DataIOException
 	 */
 	public void writeListTo(ObjectOutputFlow<Cliente> output) throws DataIOException {
-		RestTemplate tp = restService.createRestTemplate();
-		String url = restService.getBaseURL()+ENTRYPOINT_URL+"/list";
+		String path = getResourcePath()+"/list";
+		RestClientRequest request = requestFactory.createRequest(path);
 		RequestCallback cb = null;
 		ResponseExtractor<Cliente> ex = 
 				new ObjectFlowResponseExtractor<Cliente>(serializationService, output, Cliente.class);
 		logger.debug("Quering server for Cliente List...");
-		try {
-			tp.execute(url, HttpMethod.GET, cb, ex);
-		} catch (RestClientException rce) {
-			throw exceptionHandler.getDataAccessException(rce);
-		}
+		executeQuery(request, HttpMethod.GET, cb, ex);
 		logger.debug("Reading cliente has ended correctly, exiting...");
 	}
 
