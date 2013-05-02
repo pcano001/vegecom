@@ -26,7 +26,7 @@ public class RestExceptionHandler extends AbstractHandlerExceptionResolver {
 		logger.debug("doResolveException, message: '{}'",ex.getMessage());
 		RestError err = errorResolver.resolve(ex,request.getLocale());
 		response.setStatus(err.getStatus().value());
-		response.setContentType("application/json");
+		response.setContentType("application/json;charset=UTF-8");
 		try {
 			serializationService.write(response.getOutputStream(), err);
 		} catch (IOException e) {

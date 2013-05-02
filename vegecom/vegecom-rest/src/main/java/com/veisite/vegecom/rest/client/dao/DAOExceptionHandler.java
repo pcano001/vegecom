@@ -29,14 +29,14 @@ public class DAOExceptionHandler {
 	
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	
-	private static final String RESOURCEACCESSEXCEPTION_KEY = "dao.error.ResourceAccessException";
-	private static final String UNKNOWNDATAACCESSEXCEPTION_KEY = "dao.error.UnknownDataAccessException";
-	private static final String UNEXPECTEDCLIENTRESPONSEFORMAT_KEY = "dao.error.UnexpectedResponseFormatClientException";
-	private static final String UNEXPECTEDSERVERRESPONSEFORMAT_KEY = "dao.error.UnexpectedResponseFormatServerException";
-	private static final String SERVERERROREXCEPTION_KEY = "dao.error.ServerErrorExceptionMessage";
-	private static final String CLIENTERROREXCEPTION_KEY = "dao.error.ClientErrorExceptionMessage";
-	private static final String SIMPLESERVERERROREXCEPTION_KEY = "dao.error.SimpleServerErrorException";
-	private static final String SIMPLECLIENTERROREXCEPTION_KEY = "dao.error.SimpleClientErrorException";
+	private static final String RESOURCEACCESSEXCEPTION_KEY = "error.rest.dao.ResourceAccessException";
+	private static final String UNKNOWNDATAACCESSEXCEPTION_KEY = "error.rest.dao.UnknownDataAccessException";
+	private static final String UNEXPECTEDCLIENTRESPONSEFORMAT_KEY = "error.rest.dao.UnexpectedResponseFormatClientException";
+	private static final String UNEXPECTEDSERVERRESPONSEFORMAT_KEY = "error.rest.dao.UnexpectedResponseFormatServerException";
+	private static final String SERVERERROREXCEPTION_KEY = "error.rest.dao.ServerErrorExceptionMessage";
+	private static final String CLIENTERROREXCEPTION_KEY = "error.rest.dao.ClientErrorExceptionMessage";
+	private static final String SIMPLESERVERERROREXCEPTION_KEY = "error.rest.dao.SimpleServerErrorException";
+	private static final String SIMPLECLIENTERROREXCEPTION_KEY = "error.rest.dao.SimpleClientErrorException";
 	
 	private SerializationService serializationService;
 
@@ -76,7 +76,8 @@ public class DAOExceptionHandler {
 		// application/json entonces se ha producido un error de sintaxis en la
 		// propia solicitud. Error en el uso de la API.
 		HttpHeaders headers = exception.getResponseHeaders();
-		if (!headers.getContentType().equals(MediaType.APPLICATION_JSON)) {
+		if (headers.getContentType()==null ||
+				!headers.getContentType().isCompatibleWith(MediaType.APPLICATION_JSON)) {
 			logger.debug("Content-type not {}: {}",MediaType.APPLICATION_JSON.toString(),headers.getContentType().toString());
 			if (exception instanceof HttpClientErrorException) {
 				message = "Internal error. Incorret request path to server or incorrect server api use.";

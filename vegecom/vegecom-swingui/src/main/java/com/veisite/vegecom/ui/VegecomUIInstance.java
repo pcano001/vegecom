@@ -19,12 +19,15 @@ import org.jdesktop.swingx.error.ErrorInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.core.NestedRuntimeException;
+import org.springframework.dao.DataAccessResourceFailureException;
 
 import com.veisite.utils.tasks.ProgressEvent;
 import com.veisite.utils.tasks.ProgressEventListener;
 import com.veisite.utils.tasks.TaskException;
 import com.veisite.vegecom.model.audit.AuditAction;
 import com.veisite.vegecom.model.exception.VegecomException;
+import com.veisite.vegecom.rest.security.RestLoginFailedException;
 import com.veisite.vegecom.service.audit.AuditService;
 import com.veisite.vegecom.service.security.SecurityService;
 import com.veisite.vegecom.service.security.SessionExpirationListener;
@@ -32,6 +35,7 @@ import com.veisite.vegecom.ui.auth.LoginPanel;
 import com.veisite.vegecom.ui.auth.LoginProcessListener;
 import com.veisite.vegecom.ui.auth.LoginProcessManager;
 import com.veisite.vegecom.ui.context.SpringContextLoader;
+import com.veisite.vegecom.ui.error.ErrorUtil;
 import com.veisite.vegecom.ui.framework.UIFrameworkInstance;
 import com.veisite.vegecom.ui.framework.menu.UIFrameworkMenuBar;
 import com.veisite.vegecom.ui.framework.menu.UIFrameworkMenuItem;
@@ -149,8 +153,7 @@ public class VegecomUIInstance extends UIFrameworkInstance {
 		
 		// Lanzamos configuracion de contexto.
 		final String[] configSpringPaths = 
-			{"META-INF/spring/applicationContext.xml",
-			 "META-INF/spring/applicationContext-restClient.xml"	};
+			{ "META-INF/spring/applicationContext.xml" };
 		final SpringContextLoader cl = new SpringContextLoader(configSpringPaths);
 		cl.addEventListener(new ProgressEventListener() {
 			@Override
@@ -238,7 +241,7 @@ public class VegecomUIInstance extends UIFrameworkInstance {
 		if (user==null || user.isEmpty() || passwd==null || passwd.isEmpty()) {
 			String m = getMessage("ui.ApplicationFrame.IncorrentUserPassword", 
 					null, "User and password must be not empty");
-			loginFailed(this, user, m);
+			loginFailed(this, user, m, null);
 			return;
 		}
 		// Hay que esperar a que se carge la configuración completamente para continuar o cancelar
@@ -281,10 +284,7 @@ public class VegecomUIInstance extends UIFrameworkInstance {
 			}
 			@Override
 			public void error(Throwable exception, String user) {
-				logger.error("Authentication error for user '{}'",loginPanel.getUser(),exception);
-				String m = getMessage("ui.ApplicationFrame.InvalidCredential", null, 
-						"Invalid credentials, not authorized or authentication server unavailable.");
-				loginFailed(thisFrame, user, m);
+				loginFailed(thisFrame, user, exception);
 				return;
 			}
 			@Override
@@ -387,7 +387,26 @@ public class VegecomUIInstance extends UIFrameworkInstance {
 	 * Se llama cuando no se valida al usuario y contraseña. Puede llamarse 
 	 * desde distintos thread
 	 */
-	private void loginFailed(final Component parent, String user, final String message) {
+	private void loginFailed(final Component parent, String user, final Throwable exception) {
+		// Ver el tipo de excepcion. Si es de conexion al servidor, avisar, si no mensaje
+		// generico
+		String m = getMessage("ui.ApplicationFrame.LoginProcessError", null, 
+				"Login process cuold not be successfully completed.");
+		if (exception instanceof RestLoginFailedException) {
+			logger.error("Authentication error for user '{}'",loginPanel.getUser(),exception);
+			m = getMessage("ui.ApplicationFrame.InvalidCredential", null, 
+					"Invalid credentials, not authorized or authentication server unavailable.");
+		}
+		if (exception instanceof DataAccessResourceFailureException) {
+			logger.error("Error trying to validate user '{}'.",loginPanel.getUser(),exception);
+			m = getMessage("ui.ApplicationFrame.LoginResourceAccessError", null, 
+					"Login failed. Error connecting to server.");
+		}
+		loginFailed(parent, user, m, exception);
+		
+	}
+
+	private void loginFailed(final Component parent, String user, final String message, Throwable exception) {
 		// Registramos el intento fallido de acceso
 		if (as!=null) {
 			String am = "Login error. ";
@@ -406,20 +425,38 @@ public class VegecomUIInstance extends UIFrameworkInstance {
 			as.auditAction(AuditAction.LOGIN_FAIL, this.getClass().getSimpleName(), null, am);
 		}
 		else logger.error("Cannot get AuditService");
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				String m = getMessage("ui.ApplicationFrame.LoginErrorTitle", null, 
-						"Login error");
-				JOptionPane.showMessageDialog(parent, message,
-						 m, 
-						 JOptionPane.ERROR_MESSAGE);
-				loginPanel.setCursor(defaultCursor);
-				loginPanel.showLoginProgress(false);
-				loginPanel.enableComponents(true);
-				loginPanel.acquireFocus();
-			}
-		});
+		Runnable toRun;
+		final String title = getMessage("ui.ApplicationFrame.LoginErrorTitle", null, 
+				"Login error");
+		if (exception==null) {
+			toRun = new Runnable() {
+				@Override
+				public void run() {
+					JOptionPane.showMessageDialog(parent, message,
+							 title, 
+							 JOptionPane.ERROR_MESSAGE);
+					loginPanel.setCursor(defaultCursor);
+					loginPanel.showLoginProgress(false);
+					loginPanel.enableComponents(true);
+					loginPanel.acquireFocus();
+				}
+			};
+		} else {
+			if (exception instanceof NestedRuntimeException)
+				exception = ((NestedRuntimeException)exception).getMostSpecificCause();
+			final ErrorInfo err = ErrorUtil.getErrorInfo(exception, title, message);
+			toRun = new Runnable() {
+				@Override
+				public void run() {
+					JXErrorPane.showDialog(parent, err);
+					loginPanel.setCursor(defaultCursor);
+					loginPanel.showLoginProgress(false);
+					loginPanel.enableComponents(true);
+					loginPanel.acquireFocus();
+				}
+			};
+		}
+		SwingUtilities.invokeLater(toRun);
 	}
 	
 

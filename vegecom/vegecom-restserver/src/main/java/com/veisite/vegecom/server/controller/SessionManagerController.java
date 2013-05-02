@@ -22,8 +22,8 @@ import com.veisite.vegecom.rest.ClientRestException;
 import com.veisite.vegecom.rest.RestException;
 import com.veisite.vegecom.rest.ServerRestException;
 import com.veisite.vegecom.rest.security.RestApiKeySession;
+import com.veisite.vegecom.rest.security.RestLoginFailedException;
 import com.veisite.vegecom.rest.security.RestSecurity;
-import com.veisite.vegecom.rest.security.RestUnauthorizedException;
 import com.veisite.vegecom.service.SerializationService;
 import com.veisite.vegecom.service.security.SecurityService;
 
@@ -86,7 +86,7 @@ public class SessionManagerController extends DefaultController {
 		try {
 			securityService.login(user, password);
 		} catch (Throwable t) {
-			throw new RestUnauthorizedException("Login failed. Invalid user or password");
+			throw new RestLoginFailedException("Login failed. Invalid user or password",t);
 		}
 		// Valid user. Generate secret an create session.
 	    String secret = null;

@@ -79,6 +79,7 @@ public class ErrorUtil {
 	
 	private static String getFirstNestedMessage(Throwable exception) {
 		String s = exception.getLocalizedMessage();
+		if (s==null) return "";
 		int i = s.indexOf("; nested exception is");
 		return i<0? s : s.substring(0, i);
 	}

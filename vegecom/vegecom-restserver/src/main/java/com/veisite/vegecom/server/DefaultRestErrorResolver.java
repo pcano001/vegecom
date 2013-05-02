@@ -30,6 +30,7 @@ import com.veisite.vegecom.rest.error.RestErrorCode;
 import com.veisite.vegecom.rest.error.RestErrorResolver;
 import com.veisite.vegecom.rest.security.RestExpiredSessionException;
 import com.veisite.vegecom.rest.security.RestInvalidSessionException;
+import com.veisite.vegecom.rest.security.RestLoginFailedException;
 import com.veisite.vegecom.rest.security.RestSecurityException;
 import com.veisite.vegecom.rest.security.RestUnauthenticatedException;
 
@@ -127,6 +128,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 		RestError err = new RestErrorTemplate();
 		err.setStatus(HttpStatus.UNAUTHORIZED);
 		RestErrorCode ec = RestErrorCode.UNAUTHORIZED_REQUEST;
+		if (rce instanceof RestLoginFailedException) ec = RestErrorCode.AUTHENTICATION_FAILED; 
 		if (rce instanceof RestUnauthenticatedException) ec = RestErrorCode.UNAUTHENTICATED_REQUEST; 
 		if (rce instanceof RestInvalidSessionException) ec = RestErrorCode.SESSION_INVALID; 
 		if (rce instanceof RestExpiredSessionException) ec = RestErrorCode.SESSION_EXPIRED; 
@@ -153,11 +155,11 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 		// Comprobemos si es una excepcion de acceso a datos
 		if (ex instanceof DataAccessException) 
 			resolveDataAccessException((DataAccessException)ex,err,locale);
-		if (ex instanceof TransactionException) 
+		else if (ex instanceof TransactionException) 
 			resolveTransactionException((TransactionException)ex,err,locale);
-		if (ex instanceof IOException) 
+		else if (ex instanceof IOException) 
 			resolveIOException((IOException)ex,err,locale);
-		resolveUnhandledException(ex,err,locale);
+		else resolveUnhandledException(ex,err,locale);
 	}
 
 	private void resolveDataAccessException(DataAccessException ex, RestError err, Locale locale) {

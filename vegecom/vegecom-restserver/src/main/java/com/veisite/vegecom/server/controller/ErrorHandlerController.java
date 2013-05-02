@@ -3,6 +3,8 @@ package com.veisite.vegecom.server.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -15,6 +17,8 @@ import com.veisite.vegecom.rest.security.RestSecurityException;
 @Controller
 public class ErrorHandlerController {
 
+	private Logger logger = LoggerFactory.getLogger(getClass());
+	
 	/**
 	 * Metodo que reporta un error de autenticacion. Se limita
 	 * a lanzar la excepcion 
@@ -24,8 +28,9 @@ public class ErrorHandlerController {
 	 * @throws RestException
 	 */
 	@RequestMapping(value="/securityError")
-	public @ResponseBody void error(HttpServletRequest request, HttpServletResponse response) throws RestException {
+	public @ResponseBody void securityError(HttpServletRequest request, HttpServletResponse response) throws RestException {
 		Throwable throwable = (Throwable) request.getAttribute("javax.servlet.error.exception");
+		logger.debug("Handling a security error. {}",throwable);
 		if (throwable!=null) {
 			if (throwable instanceof RestSecurityException) throw (RestSecurityException)throwable;
 			if (throwable instanceof RestException) throw (RestException)throwable;

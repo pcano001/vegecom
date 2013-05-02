@@ -19,7 +19,8 @@ public enum RestErrorCode {
 	UNAUTHENTICATED_REQUEST(60010,"error.rest.UnAuthenticatedRequest"),
 	SESSION_INVALID(60020,"error.rest.SessionInvalid"),
 	SESSION_EXPIRED(60030,"error.rest.SessionExpired"),
-	UNAUTHORIZED_REQUEST(60040,"error.rest.UnAuthorizatedRequest")
+	UNAUTHORIZED_REQUEST(60040,"error.rest.UnAuthorizatedRequest"),
+	AUTHENTICATION_FAILED(60050,"error.rest.AuthenticationFailed"),
 	;
 	
 	private int value;

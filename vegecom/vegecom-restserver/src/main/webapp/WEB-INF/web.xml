@@ -80,22 +80,22 @@ holder.
 	  
   </filter>
   
-	<filter-mapping>
-		<filter-name>securityFilter</filter-name>
-		<url-pattern>/rs/*</url-pattern>
-	 </filter-mapping>
+  <filter-mapping>
+	<filter-name>securityFilter</filter-name>
+	<url-pattern>/rs/*</url-pattern>
+  </filter-mapping>
   
   <error-page>
-    <error-code>404</error-code> 
-    <location>/notFoundError</location> 
-  </error-page>
-  <error-page>
     <exception-type>com.veisite.vegecom.rest.security.RestSecurityException</exception-type> 
-    <location>/securityError</location> 
+    <location>/securityError</location>
   </error-page>
   <error-page>
     <exception-type>com.veisite.vegecom.rest.RestServerException</exception-type> 
     <location>/restServerError</location> 
+  </error-page>
+  <error-page>
+    <error-code>404</error-code> 
+    <location>/notFoundError</location> 
   </error-page>
   
 </web-app>
